@@ -1,0 +1,147 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Add License {% endblock %} 
+
+{% block stylesheets %}
+  <!-- XDSoft DateTimePicker -->
+  <link rel="stylesheet" href="{% static 'plugins/xdsoft/jquery.datetimepicker.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container">
+            <div class="profile-body">
+                <div class="col-md-6 mt-4" style="margin:0 auto;">
+                  <h3 class="text-center border-bottom">Add License Info</h3>
+                      <form method="POST" enctype="multipart/form-data">
+                          {% csrf_token %}
+                            {% comment %}
+                            {% if errors %}
+                                {% if license_edit_form.errors %}
+                                    {% for field in license_edit_form %}
+                                        {% for error in field.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {{ errors }}
+                                        </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                            {% endcomment %}
+
+                            {% if license_edit_form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                              {% for error in license_edit_form.non_field_errors %}
+                                {{ error }}
+                              {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ license_edit_form.license_name.label_tag }}<span style="color:red">*</span>
+                                  {{ license_edit_form.license_name.errors }}
+                                  {{ license_edit_form.license_name|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ license_edit_form.license_number.label_tag }}
+                                  {{ license_edit_form.license_number.errors }}
+                                  {{ license_edit_form.license_number|add_class:'form-control form-control-sm' }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ license_edit_form.service_name.label_tag }}
+                                  {{ license_edit_form.service_name.errors }}
+                                  {{ license_edit_form.service_name|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ license_edit_form.service_group.label_tag }}
+                                  {{ license_edit_form.service_group.errors }}
+                                  {{ license_edit_form.service_group|add_class:'form-control form-control-sm' }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ license_edit_form.effective_quantity.label_tag }}<span style="color:red">*</span>
+                                  {{ license_edit_form.effective_quantity.errors }}
+                                  {{ license_edit_form.effective_quantity|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ license_edit_form.license_type.label_tag }}
+                                  {{ license_edit_form.license_type.errors }}
+                                  {{ license_edit_form.license_type|add_class:'form-control form-control-sm' }}
+                                  <a href="#" data-toggle="modal" data-target="#add-license-type"><small>Add License Type</small></a>
+                                </div>
+
+                                
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ license_edit_form.start_date.label_tag }}
+                                  {{ license_edit_form.start_date.errors }}
+                                  {{ license_edit_form.start_date|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ license_edit_form.end_date.label_tag }}
+                                  {{ license_edit_form.end_date.errors }}
+                                  {{ license_edit_form.end_date|add_class:'form-control form-control-sm' }}
+                                </div>
+                            </div>
+                          <div class="border-top pt-2">
+                              <button type="submit" class="btn btn-success btn-block">Submit</button>
+                          </div>
+                      </form>  
+                    <!--License Type Add Modal-->
+                    <div class="modal fade modal-add-license-type" id="add-license-type" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content new-post-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Add License Type</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                              <form method=POST>
+                                  {% csrf_token %}
+                                  <label >License Type<span style="color:red">*</span></label>
+                                  <input rows="10" class="form-control license-type" id="license-type" name="license-type"></input>
+
+                                  <br>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-success add-license-type" id="add-license-type" value="Save">Submit</button>
+                                  </div>
+                              </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--license Type Add Modal End-->  
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+
+  <!-- XDSoft DateTimePicker -->
+  <script src="{% static 'plugins/xdsoft/jquery.datetimepicker.full.min.js'%}"></script>
+
+  <script src="{% static 'js/samrat.js'%}"></script>
+  <script>
+    $(function () {
+      $("#id_start_date").datetimepicker({
+        format: 'Y-m-d',timepicker:false,mask:false,
+      });
+      $("#id_end_date").datetimepicker({
+        format: 'Y-m-d',timepicker:false,mask:false,
+      });
+  
+    });
+  </script>
+{% endblock javascripts %}

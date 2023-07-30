@@ -1,0 +1,151 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Add Service {% endblock %} 
+
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container">
+            <div class="profile-body">
+                <div class="col-md-6 mt-4" style="margin:0 auto;">
+                  <h3 class="text-center border-bottom">Add Service</h3>
+                      <form method="POST" enctype="multipart/form-data">
+                          {% csrf_token %}
+                            {% comment %}
+                            {% if errors %}
+                                {% if form.errors %}
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {{ errors }}
+                                        </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                            {% endcomment %}
+
+                            {% if service_add_form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                              {% for error in service_add_form.non_field_errors %}
+                                {{ error }}
+                              {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ service_add_form.service_name.label_tag }}
+                                  {{ service_add_form.service_name.errors }}
+                                  {{ service_add_form.service_name|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ service_add_form.service_type.label_tag }}
+                                  {{ service_add_form.service_type.errors }}
+                                  {{ service_add_form.service_type|add_class:'form-control form-control-sm' }}
+                                  <a href="#" data-toggle="modal" data-target="#add-service-type"><small>Add Service Type</small></a>
+                                </div>
+                              </div>
+                              <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ service_add_form.service_group.label_tag }}
+                                  {{ service_add_form.service_group.errors }}
+                                  {{ service_add_form.service_group|add_class:'form-control form-control-sm' }}
+                                  <a href="#" data-toggle="modal" data-target="#add-service-group"><small>Add Service Group</small></a>
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ service_add_form.service_ip.label_tag }}
+                                  {{ service_add_form.service_ip.errors }}
+                                  {{ service_add_form.service_ip|add_class:'form-control form-control-sm' }}
+                                </div>
+                              </div>
+                              <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ service_add_form.service_owner.label_tag }}
+                                  {{ service_add_form.service_owner.errors }}
+                                  {{ service_add_form.service_owner|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ service_add_form.service_file_loc.label_tag }}
+                                  {{ service_add_form.service_file_loc.errors }}
+                                  {{ service_add_form.service_file_loc|add_class:'form-control form-control-sm' }}
+                                </div>
+                              </div>
+                              <div class="form-row">
+                                <div class="form-group col-md-12">
+                                  {{ service_add_form.comment.label_tag }}
+                                  {{ service_add_form.comment.errors }}
+                                  {{ service_add_form.comment|add_class:'form-control form-control-sm' }}
+                                </div>
+                              </div>
+                          <div class="border-top pt-2">
+                              <button type="submit" class="btn btn-success btn-block">Submit</button>
+                          </div>
+                            <!--Service Type Add Modal-->
+                            <div class="modal fade modal-add-service-type" id="add-service-type" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content new-post-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">Add Service Type</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method=POST>
+                                            {% csrf_token %}
+                                            <label >Service Type<span style="color:red">*</span></label>
+                                            <input rows="10" class="form-control service-type" id="service-type" name="service-type"></input>
+        
+                                            <br>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-success add-service-type" id="add-service-type" value="Save">Submit</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            <!--Service Type Add Modal End-->
+
+                            <!--Service Group Add Modal-->
+                            <div class="modal fade modal-add-service-group" id="add-service-group" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                              <div class="modal-dialog modal-dialog-centered" role="document">
+                              <div class="modal-content new-post-content">
+                                  <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLongTitle">Add Service Group</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                  </button>
+                                  </div>
+                                  <div class="modal-body">
+                                      <form method=POST>
+                                          {% csrf_token %}
+                                          <label >Service Group<span style="color:red">*</span></label>
+                                          <input rows="10" class="form-control service-group" id="service-group" name="service-group"></input>
+      
+                                          <br>
+                                          <div class="modal-footer">
+                                              <button class="btn btn-success add-service-group" id="add-service-group" value="Save">Submit</button>
+                                          </div>
+                                      </form>
+                                  </div>
+                              </div>
+                              </div>
+                          </div>
+                          <!--Service Group Add Modal End-->
+                      </form>                                        
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'js/samrat.js'%}"></script>
+{% endblock javascripts %}

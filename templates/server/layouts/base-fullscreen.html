@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/static/assets/favicon.ico" type="image/x-icon">
+
+
+  <title>
+    PBL - {% block title %}{% endblock %}
+  </title> 
+ 
+  {% block stylesheets %}
+  
+  {% endblock stylesheets %}
+
+</head>
+<body class="hold-transition bgimage {% block body_class %}{% endblock body_class %}">
+
+  {% block content %}{% endblock content %}
+
+  {% block javascripts %}{% endblock javascripts %}
+
+<link rel="stylesheet" href="{% static 'dashboard/plugins/toastr/toastr.min.css'%}">
+<script src="{% static 'dashboard/plugins/toastr/toastr.min.js'%}"></script>
+{% if messages %}
+  {% for m in messages %}
+
+    <script>
+		$(document).ready(function() {
+			toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "newestOnTop": true,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+			}
+		});
+    toastr.{{m.tags}}('{{m}}');
+
+    </script>
+  {% endfor %}
+
+{% endif %}
+
+</body>
+</html>

@@ -1,0 +1,308 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load mod_tags %}
+{% block title %} View Server {% endblock %} 
+
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+
+
+{% endblock stylesheets %}
+{% block content %}
+        
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="profile-body">
+            <section class="col-lg-12 connectedSortable">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title">Physical Server List <a href="{% url 'export-server-xls' %}" class="btn btn-success btn-sm">Download</a></h5>
+                    </div>
+                    <div class="card-body">
+                        <table id="example3" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                <th>SL</th>
+                                <th>Server Name</th>
+                                <th>DC/DR</th>
+                                <th>Rack/Loc</th>
+                                <th>OS</th>
+                                <th>Service Name</th>
+                                <th>iDrac IP</th>
+                                <th>Primary IP</th>
+                                <th>Secondary IP</th>
+                                <th>Public IP</th>
+                                <th>Zone</th>
+                                <th>Brand</th>
+                                <th>Model</th>
+                                <th>Service Tag</th>
+                                <th>Asset Tag</th>
+                                <th>RAM</th>
+                                <th>CPU</th>
+                                <th>HDD Count</th>
+                                <th>Total Storage</th>
+                                <th>Receive Date</th>
+                                <th>Warranty Expiry</th>
+                                <th>Project</th>
+                                <th>Vendor</th>
+                                <th>Comment</th>
+                                <th>Edit</th>
+                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for server in server_list %}
+                                <tr>
+                                    <td><b>{{forloop.counter}}</b></td>
+                                    <td><b><a href="{% url 'view-single-server' server.id %} ">{{server.server_name}}</a></b></td>
+                                    
+                                    {% if server.server_rack_info.all %}
+
+                                        {% for rackinfo in server.server_rack_info.all %}
+                                        <td>{{rackinfo.get_location_display}}</td>
+                                        <td>{{rackinfo.rack}}/{{rackinfo.loc_in_rack}}</td>
+                                        {% endfor %}
+                                    {% else %}
+                                    <td></td>
+                                    <td></td>
+                                    {% endif %}
+                                    
+                                    <td>{{server.os_type}} {{server.os_version}}</td>
+                                    <td>
+                                        <b>
+                                            {% for i in server.service_name.all  %}
+                                            <a href="#" data-toggle="modal" data-target="#view-service-{{i.id}}">{{i.service_name}}</a></br>
+                                                    <!--Service Type Add Modal-->
+                                                    <div class="modal fade modal-view-service" id="view-service-{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content new-post-content">
+                                                            <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLongTitle">Service Detail</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-md-6">
+                                                                      <b>Service Name:</b>
+                                                                      {{ i.service_name }}
+                                                                    </div>
+                                                                    <div class="form-group col-md-6">
+                                                                      <b>Service Type:</b>
+                                                                      {{ i.service_type }}
+                                                                    </div>
+                                                                </div>
+                                                                  
+                                                                  <div class="form-row">
+                                                                    <div class="form-group col-md-6">
+                                                                      <b>Host:</b>
+                                                                      {% if i.physical_server.all %}
+                                                                        {% for service in i.physical_server.all %}
+                                                                            <a href="{% url 'view-single-server' service.id %}">{{service.server_name}}</a>
+                                                                        {% endfor %}
+                                                                      {% elif i.vm_runs_server.all %}
+                                                                        {% for service in i.vm_runs_server.all %}
+                                                                            <a href="{% url 'view-single-vm' service.id %}">{{service.server_name}}</a>
+                                                                        {% endfor %}
+                                                                      {% endif %}
+                                                                    </div>
+                                                                    <div class="form-group col-md-6">
+                                                                      <b>Service Group:</b>
+                                                                      {{ i.service_group}}
+                                                                    </div>
+                                                                  </div>
+                                            
+                                                                  <div class="form-row">
+                                                                    {% if i.service_ip %}
+                                                                    <div class="form-group col-md-6">
+                                                                      <b>Service IP:</b>
+                                                                      {{i.service_ip}}
+                                                                    </div>
+                                                                    {% endif %}
+                                                                    <div class="form-group col-md-6">
+                                                                      <b>Service Owner:</b>
+                                                                      {{i.service_owner}}
+                                                                    </div>
+                                                                  </div>
+                                                                
+                                                                  {% if i.service_file_loc %}
+                                                                    <div class="form-row">
+                                                                      <div class="form-group col-md-12">
+                                                                        <b>Service File Location:</b><br>
+                                                                        {{i.service_file_loc}}
+                                                                      </div>
+                                                                    </div>
+                                                                  {% endif %}
+                                            
+                                            
+                                            
+                                                                  {% if i.knowledgebase_set.all.count > 0 %}
+                                                                    <div class="form-row">
+                                                                      <div class="form-group col-md-12">
+                                                                        <b>Related KB:</b><br>
+                                                                        {% for kb in i.knowledgebase_set.all %}
+                                                                          {% if kb.status == 'published' or kb.status == 'protected' and request.user in kb.shared_with.all or request.user == kb.author  %}
+                                                                          <a href="{% url 'kb-details' kb.id kb.slug %}">{{kb.title}}</a>,<br>
+                                                                          {% endif %}
+                                                                        {% endfor %}
+                                                                      </div>
+                                                                    </div>
+                                                                  {% endif %}
+                                                                  
+                                                                  {% if i.comment %}
+                                                                  <div class="form-row">
+                                                                    <div class="form-group col-md-12">
+                                                                      <b>Comment:</b><br>
+                                                                      {{i.comment}}
+                                                                    </div>
+                                                                  </div>
+                                                                  {% endif %}
+                                                                 
+
+                                                            </div>
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--Service Type Add Modal End-->
+                                            {% endfor %}
+                                        </b>
+                                    </td>
+
+                                    <td>{% if server.idrac_ip %}
+                                            {{server.idrac_ip}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <b>
+                                            {% if server.primary_ip %}
+                                                {{server.primary_ip}}
+                                            {% endif %}
+                                        </b>
+
+                                    </td>
+                                    <td>
+                                        {% if server.secondary_ip %}
+                                            {{server.secondary_ip}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.public_ip %}
+                                            {{server.public_ip}}
+                                        {% endif %}
+                                    </td>
+                                    <td>{% if server.zone %}
+                                            {{server.zone}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.brand %}
+                                            {{server.brand}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.model %}
+                                            {{server.model}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.service_tag %}
+                                            {{server.service_tag}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.asset_code %}
+                                            {{server.asset_code}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.ram %}
+                                            {{server.ram}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.processor_core %}
+                                            {{server.processor_core}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.no_of_hdd %}
+                                            {{server.no_of_hdd}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.total_storage %}
+                                            {% if server.total_storage >= 1024 %}
+                                                {{server.total_storage|tb_value}} TB
+                                                {% if server.total_storage|gb_value > 1 %}
+                                                  {{server.total_storage|gb_value}} GB
+                                                {% endif %}
+                                            {% else %}
+                                                {{server.total_storage}} GB
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.server_receive_date %}
+                                            {{server.server_receive_date}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.warranty_expiry_date %}
+                                            {{server.warranty_expiry_date}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.project %}
+                                            {{server.project}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.vendor_name %}
+                                            {{server.vendor_name}}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if server.comment %}
+                                            {{server.comment}}
+                                        {% endif %}
+                                    </td>
+                                    <td><a href="{% url 'edit-server' server.id %}">Edit</a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+        
+{% endblock content %}
+{% block javascripts %}
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+
+<script>
+    $(function () {
+    $('#example3').DataTable({
+        // "scrollY": 300,
+        "scrollX": true,
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": false,
+        "info": true,
+        "autoWidth": true,
+        "responsive": false,
+    });
+    });
+</script>
+
+{% endblock javascripts %}

@@ -1,0 +1,267 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} {{server.server_name}} {% endblock %} 
+
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+  
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="profile-body">
+              <div class="row ml-5">
+                <div class="col-md-6 mt-4" style="margin:0 auto;">
+                  <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Information of {{ server.server_name }}</h5>
+                    </div>
+                    <div class="card-body">
+                      <fieldset class="form-group pt-3">
+                      
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>Server Name:</b>
+                            {{ server.server_name }}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Server Location:</b>
+                            {{ server.get_location_display }}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>Rack No:</b>
+                            {% for rackinfo in server.server_rack_info.all %}
+                            {{ rackinfo.rack }}
+                            {% endfor %}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Location in Rack:</b>
+                            {% for rackinfo in server.server_rack_info.all %}
+                            {{ rackinfo.loc_in_rack }}
+                            {% endfor %}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>Os type:</b>
+                            {{server.os_type}}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Os version:</b>
+                            {{server.os_version}}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-12">
+                            <b>Service name:</b>
+                              {% for i in server.service_name.all  %}
+                                {{i.service_name}},
+                              {% endfor %}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>IDrac IP:</b>
+                            {{server.idrac_ip}}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Primary IP:</b>
+                            {{server.primary_ip}}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>Other IP:</b>
+                            {{server.secondary_ip}}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Public IP:</b>
+                            {{server.public_ip}}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-12">
+                            <b>Zone:</b>
+                            {{server.zone}}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>Brand:</b>
+                            {{server.brand}}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Model:</b>
+                            {{server.model}}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>Service Tag:</b>
+                            {{server.service_tag}}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Asset Code:</b>
+                            {{server.asset_code}}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>RAM(GB):</b>
+                            {{server.ram}}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Processor Core:</b>
+                            {{server.processor_core}}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>Hard Disk Count:</b>
+                            {{server.no_of_hdd}}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Total Usable Storage(GB):</b>
+                            {{server.total_storage}}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <b>Server Receive Date:</b>
+                            {{server.server_receive_date}}
+                          </div>
+                          <div class="form-group col-md-6">
+                            <b>Warranty Expiry Date:</b>
+                            {{server.warranty_expiry_date}}
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-12">
+                            <b>Comment:</b>
+                            {{server.comment}}
+                          </div>
+                        </div>
+                      </fieldset> 
+                    </div>
+                  </div>          
+                </div>
+                <div class="col-md-6 pl-5">
+                  <div id="container">
+
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
+
+{% block javascripts %}
+
+    <script src="{% static 'plugins/raphael/raphael.min.js' %}"> </script>
+    <script> 
+      var data = JSON.parse('{{ servers|escapejs }}');
+      var data2 = JSON.parse('{{ current_server|escapejs }}');
+      console.log(data2);
+      var u_height = 15;
+      var rack_width = 250;
+      console.log(data.length)
+
+      var paper = Raphael("container", 300, 700);
+      // var anim = Raphael.animation({ cx: 100, cy: 200, fill: "blue" }, 1000);
+      var rect1 = paper.rect(20, u_height*2, rack_width, u_height*42+5).attr({ 
+        fill: "#FFF", 
+        stroke: "#000", 
+        "stroke-width": 5 
+      });
+
+        // //var ser1 = data[0];
+        for(var x in data){
+          var text2 = paper.text(150, 15,"Rack "+data[x][1]).attr({
+            "font-size": "14px", 
+            "font-weight": "600", 
+            fill: "black", stroke:"", 
+            "stroke-width": ""
+          });
+          var u_number = data[x][2]
+          var rev_u_number = 42-u_number;
+          var ff = data[x][3]
+      
+          if(ff == 1){
+          u_height2 = u_height;
+          u_len = 30;
+          u_len_txt = 37;
+        }
+        else if(ff == 2){
+          u_height2 = u_height*2;
+          u_len = 15;
+          u_len_txt = 29;
+        }
+        else if(ff == 3){
+          u_height2 = u_height*3;
+          u_len = 0;
+          u_len_txt = 24;
+        }
+        else if(ff == 4){
+          u_height2 = u_height*4;
+          u_len = -15;
+          u_len_txt = 16;
+        }
+        else if(ff == 5){
+          u_height2 = u_height*5;
+          u_len = -30;
+          u_len_txt = 10;
+        }
+
+          var rect2 = paper.rect(20, (rev_u_number*u_height)+u_len, rack_width, u_height2).attr({ 
+            fill: "0-#959292:20-#676565:20-#959292", 
+            stroke: "#000", 
+            href:"/server/view_single_server/"+data[x][4],
+            "stroke-width": 3 
+          }); 
+          if(data2[0]==data[x][0]){
+            var text1 = paper.text(150, rev_u_number*u_height+u_len_txt,data[x][0]).attr({
+              "font-size": "12px", 
+              "font-weight": "600", 
+              fill: "#01BD62", stroke:"", 
+              "stroke-width": ""
+            });
+          } else{
+            var text1 = paper.text(150, rev_u_number*u_height+u_len_txt,data[x][0]).attr({
+              "font-size": "12px", 
+              "font-weight": "600", 
+              fill: "white", stroke:"", 
+              "stroke-width": ""
+            });
+          }
+
+          var cir1 = paper.circle(40, rev_u_number*u_height+u_len_txt, 3).attr({ 
+          fill: "r(0.25, 0.75)#fff-#E20022", 
+          stroke: "#E20022", 
+          "stroke-width": 0 
+        });
+        var cir2 = paper.circle(55, rev_u_number*u_height+u_len_txt, 3).attr({ 
+          fill: "r(0.25, 0.75)#fff-#01BD62", 
+          stroke: "#01BD62", 
+          "stroke-width": 0 
+        });   
+        }
+
+        j=42
+        for(i=u_height*2;i<=u_height*42+u_height;i=i+u_height){
+          var c = paper.path("M3 "+i+"L20 "+ i);
+          var text1 = paper.text(7,i+7.5, j)
+          j=j-1
+        }
+      </script> 
+{% endblock javascripts %}

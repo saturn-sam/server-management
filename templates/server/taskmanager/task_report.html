@@ -1,0 +1,312 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Search Task {% endblock %} 
+
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap-multiselect/css/BsMultiSelect.min.css' %}">
+
+
+{% endblock stylesheets %}
+
+  
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="profile-body">
+                <div class="col-md-6 mt-2 pb-2 border" style="margin:0 auto;">
+                  <form method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      {% if errors %}
+                      <div class="alert alert-danger" role="alert">
+                        {{ errors }}
+                      </div>
+                      {% endif %}
+                      <div class="row">
+                          
+                        <div class="col-md-6">
+                          <strong>Assigned To:</strong>
+                            <select class="form-select form-select-sm" name="assigned_to" id="multiple-checkboxes1" multiple="multiple">
+                                <option value="all">All</option>
+                                {% for user in all_users %}
+                                <option value="{{user.id}}">{{user.get_full_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                          <strong>Assigned By:</strong>
+                            <select class="form-select form-select-sm" name="assigned_by" id="multiple-checkboxes2" multiple="multiple">
+                                <option value="all">All</option>
+                                {% for user in all_users %}
+                                <option value="{{user.id}}">{{user.get_full_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                          
+                        <div class="col-md-6">
+                          <strong>Task Status:</strong>
+                            <select class="form-select form-select-sm" name="task_status" id="multiple-checkboxes3" multiple="multiple">
+                                <option value="all">All</option>
+                                <option value="2">Completed</option>
+                                <option value="1">Incomplete</option>
+                                <option value="3">Paused</option>
+                                <option value="4">Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                          <strong>Due Date:</strong>
+                            <select class="form-select form-select-sm" name="task_due" id="multiple-checkboxes4" multiple="multiple">
+                                <option value="all">All Task</option>
+                                <option value="all">Due Date Passed</option>
+                                <option value="all">Due Date not Passed</option>
+                            </select>
+                        </div>
+                      </div><br>
+
+
+                      <div class="row">
+                        <div class="col-md-6 border-top pt-2">
+                          <button name="show" type="submit" class="btn btn-success btn-block">Show</button>
+                        </div>
+                        <div class="col-md-6 border-top pt-2">
+                          <button name="download" type="submit" class="btn btn-success btn-block">Download</button>
+                        </div>
+                      </div>
+
+                  </form>                                        
+                </div>
+                {% if task_query %}
+                <section class="col-lg-12 connectedSortable">
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="card-title">Search Result</h5>
+                        </div>
+                        
+                        <div class="card-body">
+                          
+                          <table id="example3" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Task ID</th>
+                                    <th>Task</th>
+                                    <th>Description</th>
+                                    <th>Assigned To</th>
+                                    <th>Assigned By</th>
+                                    <th>Due Date</th>
+                                    <th>Completion Date</th>
+                                    <th>Task Status</th>
+                                       
+                                    <th>Comments</th>
+                                        
+                                    <th>Related KB</th>
+                                    <th>Reference Task</th>
+                                    <th>Created By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task_list in task_query %}
+
+                                    <tr 
+                                        {% if task_list.task_status == 1 and task_list.is_past_due or task_list.task_status == 3 and task_list.is_past_due %}
+                                            style="background-color: red;"
+
+                                        {% elif task_list.task_status == 1 and not task_list.is_past_due %}
+                                            style="background-color: orange;"
+                                        
+                                        {% elif task_list.task_status == 3 and not task_list.is_past_due %}
+                                            style="background-color: #b6b6b4;"    
+
+                                        {% elif task_list.task_status == 4 %}
+                                            style="background-color: #9b84c7;" 
+
+                                        {% else %}
+                                            style="background-color: #ffffff;"
+
+                                        {% endif %}
+                                    >
+                                        <td>{{forloop.counter}}</td>
+                                        <td>
+                                            <a href="{% url 'task-view' task_list.id %}">T-{{task_list.id}}</a>
+                                            {% if task_list.task_visibility == 2 %}
+                                                <i class="fa fa-lock" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Private Task"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td><a href="{% url 'task-view' task_list.id %}">{{task_list.task_title}}</a></td>
+                                        <td>{{task_list.description|truncatechars:50}}</td>
+                                        <td>
+                                            {% for assigned_to in task_list.assigned_to.all %}
+                                                {{assigned_to.get_full_name}},
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{task_list.assigned_by.get_full_name}}</td>
+                                        <td>{{task_list.due_date}}</td>
+                                        <td>
+                                            {% if task_list.completed_date %}
+                                            {{task_list.completed_date}}
+                                            {% else %}
+                                            -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if task_list.task_status == 1 %}
+                                                Incomplete
+                                            {% elif task_list.task_status == 2 %} 
+                                                Complete
+                                            {% elif task_list.task_status == 3 %}
+                                                Pause
+                                            {% elif task_list.task_status == 4 %}
+                                                Cancel
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if task_list.task_steps_commentary.all%}
+                                            <b>
+                                                <a href="#" data-toggle="modal" data-target="#view-task-comment-{{task_list.id}}">View</a></br>
+                                                
+                                                    <!--Service Type Add Modal-->
+                                                    <div class="modal fade modal-view-service" id="view-task-comment-{{task_list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content new-post-content">
+                                                            <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLongTitle">Task Step Comments</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                {% for i in task_list.task_steps_commentary.all|dictsortreversed:"add_time"  %}
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-md-6">
+                                                                        Comment:
+                                                                    </div>
+                                                                    <div class="form-group col-md-6">
+                                                                        {{i.comment}}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-md-6">
+                                                                        Commenter:
+                                                                    </div>
+                                                                    <div class="form-group col-md-6">
+                                                                        {{i.added_by.get_full_name}}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-md-6">
+                                                                        Comment date:
+                                                                    </div>
+                                                                    <div class="form-group col-md-6">
+                                                                        {{i.add_time}}
+                                                                    </div>
+                                                                </div>
+                                                                <hr>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--Service Type Add Modal End-->
+                                                
+                                            </b>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if task_list.task_procedure_or_kb %}
+                                                {%for tasklistkb in task_list.task_procedure_or_kb.all%}
+                                                    <a href="{% url 'kb-details' tasklistkb.id tasklistkb.slug %}">KB-{{ tasklistkb.id }}</a>,
+                                                {%endfor%}
+                                                
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if task_list.reference_task %}
+                                                <a href="{% url 'task-view' task_list.reference_task.id %}">T-{{task_list.reference_task.id}}</a>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{task_list.created_by.get_full_name}}</td>
+                                        
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                    </div>
+                </section>  
+                {% endif %}              
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
+
+{% block javascripts %}
+  <script src="{% static 'plugins/popper/popper.min.js'%}"></script>
+  <script src="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js'%}"></script>
+
+  <script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+
+<script>
+  $(function () {
+    $("#id_server_receive_date").datetimepicker({
+      format: 'Y-m-d',timepicker:false,mask:false,
+    });
+    $("#id_warranty_expiry_date").datetimepicker({
+      format: 'Y-m-d',timepicker:false,mask:false,
+    });
+ 
+  });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#multiple-checkboxes1').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#multiple-checkboxes2').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#multiple-checkboxes3').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#multiple-checkboxes4').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#multiple-checkboxes5').bsMultiSelect({
+          placeholder:'All',
+        });
+    });
+</script>
+    <script>
+      $(function () {
+        $('#example3').DataTable({
+            // "scrollY": 300,
+            "scrollX": true,
+            "paging": false,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": false,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false,
+        });
+      });
+    </script>    
+{% endblock javascripts %}

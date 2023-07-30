@@ -1,0 +1,137 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% block title %} View Service {% endblock %} 
+
+
+{% block stylesheets %}
+
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="profile-body">
+            <section class="col-md-8 mt-4" style="margin:0 auto;">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title">My Master Key</h5>
+                    </div>
+                    <div class="card-body">
+                        <table id="example3" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Master Key Title</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mp in mp_ins %}
+                                <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{mp.master_key_name}}</td>
+
+                                    <td>
+                                        <div class="row ml-1">
+                                            <a class="mr-1" id="show-btn-{{pass.id}}" href="#" data-toggle="modal" data-target="#view-pass-{{pass.id}}"><button class="btn btn-outline-success btn-sm"><i class="fa fa-eye" aria-hidden="true"></i></button></a>
+
+                                            <a class="mr-1" id="edit-btn-{{pass.id}}" href="{% url 'change_master_pass' %}"><button class="btn btn-outline-success btn-sm"><i class="fa fa-edit" aria-hidden="true"></i></button></a>
+
+                                            <a class="mr-1" id="delete-btn-{{pass.id}}" href="#" data-toggle="modal" data-target="#delete-pass-{{pass.id}}"><button class="btn btn-outline-success btn-sm"><i class="fa fa-trash" aria-hidden="true"></i></button></a>
+                                        </div>
+
+                                        <div class="modal fade view-pass" id="view-pass-{{pass.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content new-post-content">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">Enter Master Key {{pass.master_key.master_key_name}}</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method=POST id="view-pass-form-{{pass.id}}">
+                                                        {% csrf_token %}
+                                                        
+                                                        <input class="entry-id" name="entry-id" type="hidden" value="{{pass.id}}"></input>
+                                                        <label>Master Key: </label>
+                                                        <span style="color:red">*</span>
+                                                        <input rows="10" type="password" class="form-control view-pass-name" id="pass-id-{{pass.id}}" name="view-pass-name"></input>
+                                                        <br>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-success view-pass-btn" id="view-pass-{{pass.id}}" value="Save" data-passid="{{pass.id}}">Submit</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal fade delete-pass" id="delete-pass-{{pass.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content new-post-content">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">To Confirm Deletion Enter Master Key {{pass.master_key.master_key_name}}</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method=POST id="delete-pass-form-{{pass.id}}">
+                                                        {% csrf_token %}
+                                                        
+                                                        <input class="entry-id" name="delete-entry-id" type="hidden" value="{{pass.id}}"></input>
+                                                        <label>Master Key: </label>
+                                                        <span style="color:red">*</span>
+                                                        <input rows="10" type="password" class="form-control delete-pass-name" id="pass-id-{{pass.id}}" name="delete-pass-name"></input>
+                                                        <br>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-success delete-pass-btn" id="delete-pass-{{pass.id}}" value="Save" data-passid="{{pass.id}}">Submit</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    
+                                </tr>
+
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+<script src="{% static 'js/samrat.js'%}"></script>
+<script>
+    $(function () {
+    $('#example3').DataTable({
+        // "scrollY": 300,
+        "scrollX": false,
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": false,
+        "info": true,
+        "autoWidth": false,
+        "responsive": false,
+    });
+    });
+
+</script>
+
+{% endblock javascripts %}

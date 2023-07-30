@@ -1,0 +1,71 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% block title %} View Service {% endblock %} 
+
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="profile-body">
+            <section class="col-lg-8 connectedSortable" style="margin:0 auto;">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title">License Summary <a href="{% url 'download-license-summary' %}" type="submit" class="btn btn-success btn-sm">Download</a></h5>
+                    </div>
+                    <div class="card-body">
+                        <table id="example3" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>License Type</th>
+                                    <th>Total License Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for license in licenses %}
+                                <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{license.license_type__type_name}}</td>
+                                    <td>{{license.total}}</td>
+                                    
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+
+<script>
+    $(function () {
+    $('#example3').DataTable({
+        // "scrollY": 300,
+        "scrollX": true,
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": false,
+        "info": true,
+        "autoWidth": false,
+        "responsive": false,
+    });
+    });
+</script>
+
+{% endblock javascripts %}

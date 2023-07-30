@@ -1,0 +1,95 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-success">
+  <ul class="navmenu">
+    <li><a href="#" style="color:#fff"><b>PBL</b></a></li>
+    <li><a href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a></li>
+    <li><a href="#">Administration</a>
+      <ul>
+        <li><a href="#">Server</a>
+          <ul>
+            <li><a class="dropdown-item" href="{% url 'add-server' %}">Add New Physical Server</a></li>
+            <li><a class="dropdown-item" href="{% url 'view-server' %}">View Physical Server</a></li>
+            <div class="dropdown-divider"></div>
+            <li><a class="dropdown-item" href="{% url 'add-vm' %}">Add VM</a></li>
+            <li><a class="dropdown-item" href="{% url 'view-vm' %}">View VM</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Service</a>
+          <ul>
+            <li><a class="dropdown-item" href="{% url 'add-service' %}">Add Service</a></li>
+            <li><a class="dropdown-item" href="{% url 'view-service' %}">View Service</a></li>
+          </ul>
+        </li>
+        <li><a href="#">License Info</a>
+          <ul>
+            <li><a class="dropdown-item" href="{% url 'insert-license' %}">Add License Info</a></li>
+            <li><a class="dropdown-item" href="{% url 'view-license' %}">View All License Info</a></li>
+            <li><a class="dropdown-item" href="{% url 'view-license-summary' %}">View Active License Summary</a></li>
+            <div class="dropdown-divider"></div>
+            <li><a class="dropdown-item" href="{% url 'add-m365-license' %}">Add M365 License Info</a></li>
+          </ul>
+        </li>
+        {% if request.user.email == 'a@a.com' or request.user.email == 'samrat.ict@pubalibankbd.com' or request.user.email == 'sazedur.ict@pubalibankbd.com' %}
+          
+        
+        <li><a href="#">Password Manager</a>
+          <ul>
+            <li><a class="dropdown-item" href="{% url 'add_entry' %}">Add Password</a></li>
+            <li><a class="dropdown-item" href="{% url 'pass_list' %}">View Password List</a></li>
+            <li><a class="dropdown-item" href="{% url 'add_master_pass' %}">Add Master Key</a></li>
+            <li><a class="dropdown-item" href="{% url 'my_master_pass' %}">My Master Key</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Task Manager</a>
+          <ul>
+            <li><a class="dropdown-item" href="{% url 'add-task' %}">Add Task</a></li>
+            <li><a class="dropdown-item" href="{% url 'add-private-task' %}">Add Private Task</a></li>
+            <div class="dropdown-divider"></div>
+            <li><a class="dropdown-item" href="{% url 'task-list' %}">View All Task</a></li>
+            <li><a class="dropdown-item" href="{% url 'search-task' %}">Search Task</a></li>
+          </ul>
+        </li>
+        {% endif %}
+      </ul>
+    </li>
+
+
+    <li><a href="#">Report</a>
+      <ul>
+        <li><a class="dropdown-item" href="{% url 'search-server' %}">Search Server</a></li>
+        <li><a class="dropdown-item" href="{% url 'view-single-rack' %}">View Rack</a></li>
+      </ul>
+    </li>  
+
+    <li><a href="#">KB</a>
+      <ul>
+        <li><a class="dropdown-item" href="{% url 'kb-home' %}">Knowledge List</a></li>
+        <li><a class="dropdown-item" href="{% url 'shared-with-me' %}">Shared With Me</a></li>
+        <div class="dropdown-divider"></div>
+        <li><a class="dropdown-item" href="{% url 'add-kb' %}">Add Knowledge</a></li>
+        {% if request.user.is_superuser %}
+        <li><a class="dropdown-item" href="{% url 'add-kb-topic' %}">Add KB Topic</a></li>
+        {% endif %}
+        <li><a class="dropdown-item" href="{% url 'my-kb' %}">View My KB</a></li>
+        {% if request.user.is_superuser %}
+        <div class="dropdown-divider"></div>
+        <li><a class="dropdown-item" href="{% url 'all-kb' %}">View All KB</a></li>
+        {% endif %}
+      </ul>
+    </li>  
+
+    <li><a href="#"><i class="fa fa-user" aria-hidden="true"></i></a>
+      <ul>
+        <li><a class="dropdown-item" href="{% url 'edit-profile' request.user.id %}">
+          {% if request.user.get_full_name %}
+            {{request.user.get_full_name}}
+          {% else %}
+            {{request.user}}
+          {% endif %}
+        </a></li>
+        <li><a class="dropdown-item" href="{% url 'change_password' %}">Change Password</a></li>
+        <li><a class="dropdown-item" href="{% url 'signout' %}">Logout</a></li>
+      </ul>
+    </li>  
+
+  </ul>
+</nav>

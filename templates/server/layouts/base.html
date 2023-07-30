@@ -1,0 +1,72 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/media/img/favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap431/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/fontawesome-pro/css/all.min.css' %}">
+
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  <title>
+    PBL - {% block title %}{% endblock %}
+  </title> 
+
+  {% block stylesheets %}
+
+  {% endblock stylesheets %}
+
+</head>
+<body>
+<div class="body-sam">
+
+    {% include 'server/includes/navigation.html' %}
+
+    {% block content %}{% endblock content %}
+
+</div>
+{% include 'server/includes/footer.html' %}
+<script src="{% static 'plugins/jQuery/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap431/js/bootstrap.bundle.min.js' %}"></script>
+
+{% block javascripts %}{% endblock javascripts %}
+
+<link rel="stylesheet" href="{% static 'plugins/toastr/toastr.min.css'%}">
+<script src="{% static 'plugins/toastr/toastr.min.js'%}"></script>
+{% if messages %}
+  {% for m in messages %}
+
+    <script>
+		$(document).ready(function() {
+			toastr.options = {
+      "closeButton": true,
+      "debug": false,
+      "newestOnTop": true,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+			}
+		});
+    toastr.{{m.tags}}('{{m}}');
+    </script>
+  {% endfor %}
+
+{% endif %}
+
+</body>
+
+</html>

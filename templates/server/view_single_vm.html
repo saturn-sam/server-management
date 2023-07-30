@@ -1,0 +1,125 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} {{server.server_name}} {% endblock %} 
+
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="page-body">
+      <div class="container-fluid">
+          <div class="profile-body">
+            <div class="row ml-5">
+              <div class="col-md-6  mt-4" style="margin:0 auto;">
+                <div class="card">
+                  <div class="card-header">
+                      <h5 class="card-title">Information of {{ server.server_name }}</h5>
+                  </div>
+                  <div class="card-body">
+                    <fieldset class="form-group pt-3">
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <b>Server Name:</b>
+                          {{ server.server_name }}
+                        </div>
+                        <div class="form-group col-md-6">
+                          <b>Server Location:</b>
+                          {{ server.location }}
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <b>Os type:</b>
+                          {{server.os_type}}
+                        </div>
+                        <div class="form-group col-md-6">
+                          <b>Os version:</b>
+                          {{server.os_version}}
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-12">
+                          <b>Hosted Service:</b>
+                            {% for i in server.service_name.all  %}
+                              <a href="{% url 'view-single-service' i.id %}">{{i.service_name}}</a>,
+                            {% endfor %}
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <b>Primary IP:</b>
+                          {{server.primary_ip}}
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <b>Location type:</b>
+                          {{server.vm_location_type}}
+                        </div>
+                        <div class="form-group col-md-6">
+                          <b>VM Location:</b>
+                          {{server.vm_location}}
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <b>Other IP:</b>
+                          {{server.secondary_ip}}
+                        </div>
+                        <div class="form-group col-md-6">
+                          <b>Public IP:</b>
+                          {{server.public_ip}}
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-12">
+                          <b>Zone:</b>
+                          {{server.zone}}
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <b>RAM(GB):</b>
+                          {{server.ram}}
+                        </div>
+                        <div class="form-group col-md-6">
+                          <b>Processor Core:</b>
+                          {{server.processor_core}}
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <b>Hard Disk Count:</b>
+                          {{server.no_of_hdd}}
+                        </div>
+                        <div class="form-group col-md-6">
+                          <b>Total Usable Storage(GB):</b>
+                          {{server.total_storage}}
+                        </div>
+                      </div>
+                      <div class="form-row">
+                        <div class="form-group col-md-12">
+                          <b>Comment:</b>
+                          {{server.comment}}
+                        </div>
+                      </div>
+                    </fieldset>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+  </div>
+
+
+{% endblock content %}
+
+{% block javascripts %}
+ 
+{% endblock javascripts %}

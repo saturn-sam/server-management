@@ -1,0 +1,2 @@
+serverinfo.git
+

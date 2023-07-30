@@ -1,0 +1,181 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-success">
+  <a class="navbar-brand" href="#">PBL</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Administration
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{% url 'add-server' %}">Add New Physical Server</a>
+          <a class="dropdown-item" href="{% url 'view-server' %}">View Physical Server</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'add-vm' %}">Add VM</a>
+          <a class="dropdown-item" href="{% url 'view-vm' %}">View VM</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'add-service' %}">Add Service</a>
+          <a class="dropdown-item" href="{% url 'view-service' %}">View Service</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Reports
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{% url 'search-server' %}">Search Server</a>
+          <a class="dropdown-item" href="{% url 'view-single-rack' %}">View Rack</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Knowledge Base
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{% url 'kb-home' %}">Knowledge List</a>
+          <a class="dropdown-item" href="{% url 'shared-with-me' %}">Shared With Me</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'add-kb' %}">Add Knowledge</a>
+          {% if request.user.is_superuser %}
+          <a class="dropdown-item" href="{% url 'add-kb-topic' %}">Add KB Topic</a>
+          {% endif %}
+          <a class="dropdown-item" href="{% url 'my-kb' %}">View My KB</a>
+          {% if request.user.is_superuser %}
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'all-kb' %}">View All KB</a>            
+          {% endif %}
+
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Task Manager
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{% url 'add-task' %}">Add Task</a>
+          <a class="dropdown-item" href="{% url 'add-private-task' %}">Add Private Task</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'task-list' %}">View All Task</a>
+          <a class="dropdown-item" href="{% url 'search-task' %}">Search Task</a>
+          
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Monitoring
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" target="_blank" href="{% url 'monitoring_dashboard' %}">Service Monitoring</a>
+          
+        </div>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          PM
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{% url 'add_master_pass' %}">Add Master Key</a>
+          <a class="dropdown-item" href="{% url 'my_master_pass' %}">My Master Key</a>
+          <a class="dropdown-item" href="{% url 'add_entry' %}">Add Password</a>
+          <a class="dropdown-item" href="{% url 'pass_list' %}">View Password List</a>
+          
+        </div>
+      </li>
+
+
+    </ul>
+    <ul class="navbar-nav pr-3">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-user" aria-hidden="true"></i>
+        </a>
+        
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{% url 'edit-profile' request.user.id %}">
+            {% if request.user.get_full_name %}
+              {{request.user.get_full_name}}
+            {% else %}
+              {{request.user}}
+            {% endif %}
+          </a>
+          <a class="dropdown-item" href="{% url 'change_password' %}">Change Password</a>
+          <a class="dropdown-item" href="{% url 'signout' %}">Logout</a>
+          
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+
+{% comment %} 
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-success justify-content-between">
+    <a class="navbar-brand" href="#">PBL</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Administration
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'add-server' %}">Add New Physical Server</a>
+            <a class="dropdown-item" href="{% url 'view-server' %}">View Physical Server</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'add-vm' %}">Add VM</a>
+            <a class="dropdown-item" href="{% url 'view-vm' %}">View VM</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'add-service' %}">Add Service</a>
+            <a class="dropdown-item" href="{% url 'view-service' %}">View Service</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Reports
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{% url 'search-server' %}">Search Server</a>
+            <a class="dropdown-item" href="{% url 'view-single-rack' %}">View Rack</a>
+          </div>
+        </li>
+
+      </ul>
+      <ul class="navbar-nav pr-3">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-user" aria-hidden="true"></i>
+          </a>
+          
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">
+              {% if request.user.get_full_name %}
+                {{request.user.get_full_name}}
+              {% else %}
+                {{request.user}}
+              {% endif %}
+            </a>
+            <a class="dropdown-item" href="{% url 'change_password' %}">Change Password</a>
+            <a class="dropdown-item" href="{% url 'signout' %}">Logout</a>
+            
+          </div>
+        </li>
+      </ul>
+
+    </div>
+  </nav>
+  <!-- /.navbar -->  {% endcomment %}

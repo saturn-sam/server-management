@@ -1,0 +1,60 @@
+                  <div class="mt-3">
+                     <div class="row d-sm-flex justify-content-between text-left">
+                        <div class="col-6">
+                           {% if user.is_authenticated  %}
+                              <form action="{% url 'home' %}" method="post">
+                                 {% csrf_token %}
+                                 {% if is_liked %}
+                                    <div>
+                                       <button id="like" class="" type="submit" name="post_id" value="{{kb.id}}" style="padding: 2; border: none; background: none; cursor: pointer;">
+                                          <h4> 
+                                             <i style="color:red"  class="fa fa-heart"></i>
+                                          </h4>
+                                       </button>
+                                    </div>
+                                 {% else %}
+                                    <div>
+                                       <button  id="like" type="submit" name="post_id" value="{{kb.id}}" style="padding: 2; border: none; background: none; cursor: pointer;">
+                                          <h4>
+                                             <i style="color:#536662" class="fa fa-heart"></i>
+                                          </h4>
+                                       </button>
+                                    </div>
+                                 {% endif %}
+                              </form>
+                           {% else %}
+                              <a href="{% url 'login' %}?next={{request.path}}"  style="padding: 2; border: none; background: none; cursor: pointer;">
+                                    <h4> <i style="color:#536662"  class="fa fa-heart"></i></h4>
+                              </a>
+                           {% endif %}
+                        </div>                        
+                     </div>
+                  </div>
+                  <div class="mb-3">
+                     {% if like_count == 1 %}
+                        <div class="d-sm-flex justify-content-between text-left">
+                           {% for likers in liker %}
+                              {% if likers == 'you' %}
+                                 <div class="like-info"><span class="align-left"></span>{{likers|capfirst }}  <i style="color:red" class="fa fa-heart"></i> This Knowledge</div>   
+                              {% else %}
+                                 <div class="like-info"><span class="align-left"></span>{{likers.get_full_name|capfirst }}  <i style="color:red" class="fa fa-heart"></i> This Knowledge</div>  
+                              {% endif %}
+                                                       
+                           {% endfor %}
+
+                        </div>
+                     {% elif like_count > 1 %}
+                        <div class="d-sm-flex justify-content-between text-left">
+                        {% for likers in liker %}
+                              {% if likers == 'you' %} 
+                                 <div class="like-info"><span class="align-left"></span>You and other {{like_count2}} person{{like_count2|pluralize}} <i style="color:red" class="fa fa-heart"></i> this Knowledge</div>
+                              {% else %}
+                                 <div class="like-info"><span class="align-left"></span>{{likers.get_full_name|capfirst }} and other {{like_count2}} person{{like_count2|pluralize}} <i style="color:red" class="fa fa-heart"></i> this Knowledge</div>
+                              {% endif %}
+
+                           
+                        {% endfor %}
+                        </div>
+                     {% endif %}
+                  </div>
+

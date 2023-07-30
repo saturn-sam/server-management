@@ -1,0 +1,320 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Search Server {% endblock %} 
+
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap-multiselect/css/BsMultiSelect.min.css' %}">
+
+
+{% endblock stylesheets %}
+
+  
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="profile-body">
+                <div class="col-md-6 mt-2 pb-2 border" style="margin:0 auto;">
+                  <form method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      {% if errors %}
+                      <div class="alert alert-danger" role="alert">
+                        {{ errors }}
+                      </div>
+                      {% endif %}
+                      <div class="row">
+                        <div class="col-md-4">
+                          <strong>Select Server Type:</strong>
+                          <select class="form-select form-select-sm" name="server_type" id="multiple-checkboxes1" multiple="multiple">
+                            <option value="all">All</option>
+                            <option value="physical_server">Physical Server</option>
+                            <option value="virtual_server">Virtual Server</option>
+                        </select>
+                        </div>                            
+                        <div class="col-md-4">
+                          <strong>Select OS:</strong>
+                            <select class="form-select form-select-sm" name="os_type" id="multiple-checkboxes2" multiple="multiple">
+                                <option value="all">All</option>
+                            {% for os_type in os_types %}
+                                <option value="{{os_type.os_type}}">{{os_type.os_type}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                          <strong>Select Service Type:</strong>
+                          <select class="form-select form-select-sm" name="service_type" id="multiple-checkboxes3" multiple="multiple">
+                              <option value="all">All</option>
+                          {% for service_type in service_types %}
+                              <option value="{{service_type.service_type_name}}">{{service_type.service_type_name}}</option>
+                          {% endfor %}
+                          </select>
+                        </div>
+
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-md-6">
+                          <strong>Select Zone:</strong>
+                          <select class="form-select form-select-sm" name="zone" id="multiple-checkboxes4" multiple="multiple">
+                              <option value="all">All</option>
+                              {% for zone in zones %}
+                                <option value="{{zone.zone}}">{{zone.zone}}</option>
+                              {% endfor %}
+                          </select>
+                        </div>
+                        <div class="col-md-6">
+                          <strong>Select Location:</strong>
+                          <select class="form-select form-select-sm" name="location" id="multiple-checkboxes5" multiple="multiple">
+                              <option value="all">All</option>
+                          {% for location in locations %}
+                              <option value="{{location}}">{{location}}</option>
+                          {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6 border-top pt-2">
+                          <button name="show" type="submit" class="btn btn-success btn-block">Show</button>
+                        </div>
+                        <div class="col-md-6 border-top pt-2">
+                          <button name="download" type="submit" class="btn btn-success btn-block">Download</button>
+                        </div>
+                      </div>
+
+                  </form>                                        
+                </div>
+                <section class="col-lg-12 connectedSortable">
+                  {% if server_list_merge_query %}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="card-title">Search Result</h5>
+                        </div>
+                        
+                        <div class="card-body">
+                            <table style="margin-bottom: 0;" id="example3" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                    <th>SL</th>
+                                    <th>Server Name</th>
+                                    <th>Server Type</th>
+                                    <th>DC/DR</th>
+                                    {% if only_physical %}
+                                      <th>Rack/Loc/FF</th>
+                                    {% endif %}
+                                    <th>OS</th>
+                                    <th>Service Name</th>
+                                    <th>Primary IP</th>
+                                    <th>Secondary IP</th>
+                                    <th>Public IP</th>
+                                    <th>Zone</th>
+                                    <th>RAM</th>
+                                    <th>Total Storage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for server in server_list_merge_query %}
+                                    <tr>
+                                        <td><b>{{forloop.counter}}</b></td>
+                                        <td>{% if server.server_type == "Physical" %}
+                                          <b><a href="{% url 'view-single-server' server.id %} ">{{server.server_name}}</a></b>
+                                          {%else%}
+                                          <b><a href="{% url 'view-single-vm' server.id %}">{{server.server_name}}</a></b>
+                                        {% endif %}
+                                        </td>
+                                        <td>{{server.server_type}}</td>
+                                        <td>
+                                          {% if server.server_type == "Physical" %}
+                                          {% for rackinfo in server.server_rack_info.all %}
+                                            {{rackinfo.get_location_display}}
+                                          {% endfor %}
+                                          {%else%}
+                                          {{server.get_location_display}}
+                                          {% endif %}
+                                        </td>
+                                        {% if only_physical %}
+                                          <td>
+                                            {% for rackinfo in server.server_rack_info.all %}
+                                              {{rackinfo.rack}}/{{rackinfo.loc_in_rack}}/{{rackinfo.form_factor}}
+                                            {% endfor %}
+                                          </td>
+                                        {% endif %}
+                                        <td>{{server.os_type}} {{server.os_version}}</td>
+                                        <td>
+                                          <div>
+                                            {% for i in server.service_name.all  %}
+                                            <a href="#" data-toggle="modal" data-target="#view-service-{{i.id}}">{{i.service_name}}</a>,</br>
+                                                    <!--Service Type Add Modal-->
+                                                    <div class="modal fade modal-view-service" id="view-service-{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content new-post-content">
+                                                            <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLongTitle">Service Detail</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-md-6">
+                                                                        Service Name:
+                                                                    </div>
+                                                                    <div class="form-group col-md-6">
+                                                                        {{i.service_name}}
+                                                                    </div>
+                                                                  </div>
+    
+                                                                  <div class="form-row">
+                                                                    <div class="form-group col-md-6">
+                                                                        Service Type:
+                                                                    </div>
+                                                                    <div class="form-group col-md-6">
+                                                                        {{i.service_type.service_type_name}}
+                                                                    </div>
+                                                                  </div>
+                                                                 
+                                                                 
+                                                                {% if i.service_ip %}
+                                                                    <div class="form-row">
+                                                                        <div class="form-group col-md-6">
+                                                                            Service IP:
+                                                                        </div>
+                                                                        <div class="form-group col-md-6">
+                                                                            {{i.service_ip}}
+                                                                        </div>
+                                                                    </div>
+                                                                {% endif %}
+                                                                {% if i.service_file_loc %}
+                                                                    <div class="form-row">
+                                                                        <div class="form-group col-md-6">
+                                                                            Service File Location:
+                                                                        </div>
+                                                                        <div class="form-group col-md-6">
+                                                                            {{i.service_file_loc}}
+                                                                        </div>
+                                                                    </div>
+                                                                {% endif %}
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-md-6">
+                                                                        Service Owner:
+                                                                    </div>
+                                                                    <div class="form-group col-md-6">
+                                                                        {{i.service_owner}}
+                                                                    </div>
+                                                                </div>
+                                                                 
+    
+                                                            </div>
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    <!--Service Type Add Modal End-->
+                                            {% endfor %}
+                                          </div>
+                                        </td>
+                                        <td>
+                                            <b>
+                                                {% if server.primary_ip %}
+                                                    {{server.primary_ip}}
+                                                {% endif %}
+                                            </b>
+                                        </td>
+                                        <td>
+                                            {% if server.secondary_ip %}
+                                                {{server.secondary_ip}}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if server.public_ip %}
+                                                {{server.public_ip}}
+                                            {% endif %}
+                                        </td>
+                                        <td>{% if server.zone %}
+                                                {{server.zone}}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if server.ram %}
+                                                {{server.ram}}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if server.total_storage %}
+                                                {{server.total_storage}}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                    </div>
+                  {% endif %}
+                </section>                
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
+
+{% block javascripts %}
+  <script src="{% static 'plugins/popper/popper.min.js'%}"></script>
+  <script src="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js'%}"></script>
+
+  <script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+
+<script>
+  $(function () {
+    $("#id_server_receive_date").datetimepicker({
+      format: 'Y-m-d',timepicker:false,mask:false,
+    });
+    $("#id_warranty_expiry_date").datetimepicker({
+      format: 'Y-m-d',timepicker:false,mask:false,
+    });
+ 
+  });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#multiple-checkboxes1').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#multiple-checkboxes2').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#multiple-checkboxes3').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#multiple-checkboxes4').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#multiple-checkboxes5').bsMultiSelect({
+          placeholder:'All',
+        });
+    });
+</script>
+    <script>
+      $(function () {
+        $('#example3').DataTable({
+            // "scrollY": 300,
+            "scrollX": true,
+            "paging": false,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": false,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false,
+        });
+      });
+    </script>    
+{% endblock javascripts %}

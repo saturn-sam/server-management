@@ -1,0 +1,188 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% block title %} View Service {% endblock %} 
+
+
+{% block stylesheets %}
+
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.css' %}">
+  
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="profile-body">
+            <div class="row mt-3" >
+                <div class="col-md-4 border p-3" style="margin:0 auto;">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                            <fieldset class="form-group">
+                                <h5>Filter Services</h5>
+                                <hr>
+                                {% comment %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <strong>Exclude Machine Identification Service: </strong>
+                                        <input checked type="checkbox" id="machine_service" name="machine_service" value="1">
+     
+                                    </div>
+
+                                </div><br>
+                                {% endcomment %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <strong>Service Name:</strong>
+                                        <select name="service_name" id="multiple-checkboxes4" class="form-control form-control-sm" multiple="multiple">
+                                            {% for service in service_names %}
+                                            <option value="{{service.id}}">{{service.service_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>Service Group:</strong>
+                                        <select name="service_group" id="multiple-checkboxes1" class="form-control form-control-sm" multiple="multiple">
+                                            {% for service_group in service_groups %}
+                                            <option value="{{service_group.id}}">{{service_group.service_group_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Service Type:</strong>
+                                        <select name="service_type" id="multiple-checkboxes2" class="form-control form-control-sm" multiple="multiple">
+                                            {% for service_type in service_types %}
+                                                <option value="{{service_type.id}}">{{service_type.service_type_name}}</option>
+                                            {% endfor %}
+
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Service Owner:</strong>
+                                        <select name="service_owner" id="multiple-checkboxes3" class="form-control form-control-sm" multiple="multiple">
+                                            {% for service_o in service_owner %}
+                                                <option value="{{service_o.service_owner}}">{{service_o.service_owner}}</option>
+                                            {% endfor %}
+
+                                        </select>
+                                    </div>
+                                </div><br>
+                            </fieldset>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input class="btn btn-success btn-block" type="submit" value="show" name="show">
+                            </div>
+                            <div class="col-md-6">
+                                <input class="btn btn-success btn-block" type="submit" value="download" name="download">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% if service_list %}
+            <section class="col-lg-12 connectedSortable">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title">Services</h5>
+                    </div>
+                    <div class="card-body">
+                        <table id="example3" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Service Name</th>
+                                    <th>Service Group</th>
+                                    <th>Service Type</th>
+                                    <th>Host Server</th>
+                                    <th>Service Ip</th>
+                                    <th>Service Owner</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for service in service_list %}
+                                <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td><a href="{% url 'view-single-service' service.id %}">{{service.service_name}}</a></td>
+                                    <td>{{service.service_group.service_group_name}}</td>
+                                    <td>{{service.service_type.service_type_name}}</td>
+                                    <td> 
+                                        {% if service.physical_server.all %}
+                                            {% for server in service.physical_server.all %}
+                                                <a href="{% url 'view-single-server' server.id %}">{{server.server_name}}</a>
+                                            {% endfor %}
+                                        {% elif service.vm_runs_server.all %}
+                                            {% for server in service.vm_runs_server.all %}
+                                                <a href="{% url 'view-single-vm' server.id %}">{{server.server_name}}</a>
+                                                {% endfor %}
+                                        {% endif %}
+                                        
+                                        </td>
+                                    <td> {% if service.service_ip %} {{service.service_ip}} {% endif %}</td>
+                                    <td>{{service.service_owner}}</td>
+
+                                    <td><a href="{% url 'edit-service' service.id %}" >Edit</a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/popper/popper.min.js'%}"></script>
+<script src="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js'%}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+
+<script>
+    $(function () {
+    $('#example3').DataTable({
+        // "scrollY": 300,
+        "scrollX": true,
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": false,
+        "info": true,
+        "autoWidth": false,
+        "responsive": false,
+    });
+    });
+
+    $(document).ready(function() {
+        $('#multiple-checkboxes1').bsMultiSelect({
+          placeholder:'All',
+        });
+    });
+    $(document).ready(function() {
+        $('#multiple-checkboxes2').bsMultiSelect({
+          placeholder:'All',
+        });
+    });
+    $(document).ready(function() {
+        $('#multiple-checkboxes3').bsMultiSelect({
+          placeholder:'All',
+        });
+    });
+    $(document).ready(function() {
+        $('#multiple-checkboxes4').bsMultiSelect({
+          placeholder:'All',
+          useChoicesDynamicStyling: true,
+        });
+    });
+</script>
+
+{% endblock javascripts %}

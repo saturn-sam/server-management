@@ -1,0 +1,42 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Add Service {% endblock %} 
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container">
+            <div class="profile-body">
+                <div class="col-md-8 mt-4" style="margin:0 auto;">
+                  <h3 class="text-center border-bottom">Add Knowledge</h3>
+                      <form method="POST" enctype="multipart/form-data">
+                          {% csrf_token %}
+                            {{ form.media  }}
+                            {{ form|crispy }}
+                          <div class="border-top pt-2">
+                              <button type="submit" class="btn btn-success btn-block">Submit</button>
+                          </div>
+                      </form>                                        
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/popper/popper.min.js'%}"></script>
+<script src="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js'%}"></script>
+<script>
+    $(document).ready(function() {
+        $('#id_related_service').bsMultiSelect({
+          placeholder:'Select',
+        });
+    });
+</script>
+{% endblock javascripts %}

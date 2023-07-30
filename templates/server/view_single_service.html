@@ -1,0 +1,114 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} {{service_details.service_name}} {% endblock %} 
+
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="page-body">
+      <div class="container-fluid">
+          <div class="profile-body">
+            <div class="row ml-5">
+              <div class="col-md-6  mt-4" style="margin:0 auto;">
+                <div class="card">
+                  <div class="card-header">
+                      <h5 class="card-title">{{ service_details.service_name }}</h5>
+                  </div>
+                  <div class="card-body">
+                    <fieldset class="form-group pt-1">
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <b>Service Name:</b>
+                          {{ service_details.service_name }}
+                        </div>
+                        <div class="form-group col-md-6">
+                          <b>Service Type:</b>
+                          {{ service_details.service_type }}
+                        </div>
+                      </div>
+                      
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <b>Host:</b>
+                          {% if service_details.physical_server.all %}
+                            {% for service in service_details.physical_server.all %}
+                                <a href="{% url 'view-single-server' service.id %}">{{service.server_name}}</a>
+                            {% endfor %}
+                          {% elif service_details.vm_runs_server.all %}
+                            {% for service in service_details.vm_runs_server.all %}
+                                <a href="{% url 'view-single-vm' service.id %}">{{service.server_name}}</a>
+                            {% endfor %}
+                          {% endif %}
+                        </div>
+                        <div class="form-group col-md-6">
+                          <b>Service Group:</b>
+                          {{ service_details.service_group}}
+                        </div>
+                      </div>
+
+                      <div class="form-row">
+                        {% if service_details.service_ip %}
+                        <div class="form-group col-md-6">
+                          <b>Service IP:</b>
+                          {{service_details.service_ip}}
+                        </div>
+                        {% endif %}
+                        <div class="form-group col-md-6">
+                          <b>Service Owner:</b>
+                          {{service_details.service_owner}}
+                        </div>
+                      </div>
+                    
+                      {% if service_details.service_file_loc %}
+                        <div class="form-row">
+                          <div class="form-group col-md-12">
+                            <b>Service File Location:</b><br>
+                            {{service_details.service_file_loc}}
+                          </div>
+                        </div>
+                      {% endif %}
+
+
+
+                      {% if service_details.knowledgebase_set.all.count > 0 %}
+                        <div class="form-row">
+                          <div class="form-group col-md-12">
+                            <b>Related KB:</b><br>
+                            {% for kb in service_details.knowledgebase_set.all %}
+                              {% if kb.status == 'published' or kb.status == 'protected' and request.user in kb.shared_with.all or request.user == kb.author  %}
+                              <a href="{% url 'kb-details' kb.id kb.slug %}">{{kb.title}}</a>,<br>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endif %}
+                      
+                      {% if service_details.comment %}
+                      <div class="form-row">
+                        <div class="form-group col-md-12">
+                          <b>Comment:</b><br>
+                          {{service_details.comment}}
+                        </div>
+                      </div>
+                      {% endif %}
+                    </fieldset>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+  </div>
+
+
+{% endblock content %}
+
+{% block javascripts %}
+ 
+{% endblock javascripts %}

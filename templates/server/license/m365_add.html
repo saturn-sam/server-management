@@ -1,0 +1,92 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Add M365 License Info {% endblock %} 
+
+{% block stylesheets %}
+  <!-- XDSoft DateTimePicker -->
+  <link rel="stylesheet" href="{% static 'plugins/xdsoft/jquery.datetimepicker.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container">
+            <div class="profile-body">
+                <div class="col-md-6 mt-4" style="margin:0 auto;">
+                  <h3 class="text-center border-bottom">Add M365 License Info</h3>
+                      <form method="POST" enctype="multipart/form-data">
+                          {% csrf_token %}
+
+                            {% if license_add_form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                              {% for error in license_add_form.non_field_errors %}
+                                {{ error }}
+                              {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ license_add_form.user_name.label_tag }}<span style="color:red">*</span>
+                                  <span style="color:red">{{ license_add_form.user_name.errors }}</span>
+                                  {{ license_add_form.user_name|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ license_add_form.user_id.label_tag }}<span style="color:red">*</span>
+                                  <span style="color:red">{{ license_add_form.user_id.errors }}</span>
+                                  {{ license_add_form.user_id|add_class:'form-control form-control-sm' }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ license_add_form.hostname.label_tag }}<span style="color:red">*</span>
+                                  <span style="color:red">{{ license_add_form.hostname.errors }}</span>
+                                  {{ license_add_form.hostname|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ license_add_form.ip_address.label_tag }}<span style="color:red">*</span>
+                                  <span style="color:red">{{ license_add_form.ip_address.errors }}</span>
+                                  {{ license_add_form.ip_address|add_class:'form-control form-control-sm' }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ license_add_form.branch.label_tag }}<span style="color:red">*</span>
+                                  <span style="color:red">{{ license_add_form.branch.errors }}</span>
+                                  {{ license_add_form.branch|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ license_add_form.date.label_tag }}<span style="color:red">*</span>
+                                  <span style="color:red">{{ license_add_form.date.errors }}</span>
+                                  {{ license_add_form.date|add_class:'form-control form-control-sm' }}
+                                </div>
+                            </div>
+
+
+                          <div class="border-top pt-4">
+                              <button type="submit" class="btn btn-success btn-block">Submit</button>
+                          </div>
+                      </form>  
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+
+  <!-- XDSoft DateTimePicker -->
+  <script src="{% static 'plugins/xdsoft/jquery.datetimepicker.full.min.js'%}"></script>
+
+  <script src="{% static 'js/samrat.js'%}"></script>
+  <script>
+    $(function () {
+      $("#id_date").datetimepicker({
+        format: 'Y-m-d',timepicker:false,mask:false,
+      });
+  
+    });
+  </script>
+{% endblock javascripts %}

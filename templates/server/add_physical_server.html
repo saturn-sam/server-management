@@ -1,0 +1,497 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Add Physical Server {% endblock %} 
+
+
+{% block stylesheets %}
+  <!-- XDSoft DateTimePicker -->
+  <link rel="stylesheet" href="{% static 'plugins/xdsoft/jquery.datetimepicker.min.css' %}">
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container">
+            <div class="profile-body">
+                <div class="col-md-8" style="margin:0 auto;">
+                    <form method="POST" enctype="multipart/form-data" >
+                        {% csrf_token %}
+                        {% for hidden_field in server_add_form.hidden_fields %}
+                          {{ hidden_field }}
+                        {% endfor %}
+                    
+
+                        <fieldset class="form-group pt-3">
+                          <h3 class="text-center">Add Physical Server</h3>
+                          {% if server_rack_info_add_form.non_field_errors %}
+                          <div class="alert alert-danger" role="alert">
+                            {% for error in server_rack_info_add_form.non_field_errors %}
+                              {{ error }}
+                            {% endfor %}
+                          </div>
+                          {% endif %}
+
+                          {% if server_add_form.non_field_errors %}
+                          <div class="alert alert-danger" role="alert">
+                            {% for error in server_add_form.non_field_errors %}
+                              {{ error }}
+                            {% endfor %}
+                          </div>
+                          {% endif %}                          
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.server_name.label_tag }}    
+                              <span style="color:red">*</span>
+                              {{ server_add_form.server_name.errors }}
+                              {{ server_add_form.server_name|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_rack_info_add_form.location.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_rack_info_add_form.location.errors }}
+                              {{ server_rack_info_add_form.location|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_rack_info_add_form.rack.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_rack_info_add_form.rack.errors }}
+                              {{ server_rack_info_add_form.rack|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_rack_info_add_form.loc_in_rack.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_rack_info_add_form.loc_in_rack.errors }}
+                              {{ server_rack_info_add_form.loc_in_rack|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-12">
+                              {{ server_rack_info_add_form.form_factor.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_rack_info_add_form.form_factor.errors }}
+                              {{ server_rack_info_add_form.form_factor|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.os_type.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_add_form.os_type.errors }}
+                              
+                              {{ server_add_form.os_type|add_class:'form-control form-control-sm' }}
+                              
+                              
+                              <a href="#" data-toggle="modal" data-target="#add-os"><small>Add OS Name</small></a>
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.os_version.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_add_form.os_version.errors }}
+                              {{ server_add_form.os_version|add_class:'form-control form-control-sm' }}
+                              <a href="#" data-toggle="modal" data-target="#add-os-version"><small>Add OS Version</small></a>
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.service_name.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_add_form.service_name.errors }}
+                              <div class="service-class">
+                                {{ server_add_form.service_name|add_class:'form-control form-control-sm'}}
+                              </div>
+                              
+                              {{ server_add_form.service_name.help_text }}
+                              <a href="#" data-toggle="modal" data-target="#add-service"><small>Add Service</small></a>
+                            </div>
+                            
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.idrac_ip.label_tag }}
+                              {{ server_add_form.idrac_ip.errors }}
+                              {{ server_add_form.idrac_ip|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.primary_ip.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_add_form.primary_ip.errors }}
+                              {{ server_add_form.primary_ip|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.secondary_ip.label_tag }}
+                              {{ server_add_form.secondary_ip.errors }}
+                              {{ server_add_form.secondary_ip|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.public_ip.label_tag }}
+                              {{ server_add_form.public_ip.errors }}
+                              {{ server_add_form.public_ip|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-12">
+                              {{ server_add_form.zone.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_add_form.zone.errors }}
+                              {{ server_add_form.zone|add_class:'form-control form-control-sm' }}
+                              <a href="#" data-toggle="modal" data-target="#add-zone"><small>Add Zone</small></a>
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.brand.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_add_form.brand.errors }}
+                              {{ server_add_form.brand|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.model.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_add_form.model.errors }}
+                              {{ server_add_form.model|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.service_tag.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_add_form.service_tag.errors }}
+                              {{ server_add_form.service_tag|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.asset_code.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ server_add_form.asset_code.errors }}
+                              {{ server_add_form.asset_code|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.ram.label_tag }}
+                              {{ server_add_form.ram.errors }}
+                              {{ server_add_form.ram|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.processor_core.label_tag }}
+                              {{ server_add_form.processor_core.errors }}
+                              {{ server_add_form.processor_core|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.no_of_hdd.label_tag }}
+                              {{ server_add_form.no_of_hdd.errors }}
+                              {{ server_add_form.no_of_hdd|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.total_storage.label_tag }}
+                              {{ server_add_form.total_storage.errors }}
+                              {{ server_add_form.total_storage|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.server_receive_date.label_tag }}
+                              {{ server_add_form.server_receive_date.errors }}
+                              {{ server_add_form.server_receive_date|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.warranty_expiry_date.label_tag }}
+                              {{ server_add_form.warranty_expiry_date.errors }}
+                              {{ server_add_form.warranty_expiry_date|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.project.label_tag }}
+                              {{ server_add_form.project.errors }}
+                              {{ server_add_form.project|add_class:'form-control form-control-sm' }}
+                              <a href="#" data-toggle="modal" data-target="#add-project"><small>Add Project</small></a>
+                            </div>
+                            <div class="form-group col-md-6">
+                              {{ server_add_form.vendor_name.label_tag }}
+                              {{ server_add_form.vendor_name.errors }}
+                              {{ server_add_form.vendor_name|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                          <div class="form-row">
+                            <div class="form-group col-md-12">
+                              {{ server_add_form.comment.label_tag }}
+                              {{ server_add_form.comment.errors }}
+                              {{ server_add_form.comment|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                        </fieldset>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-block" type="submit">
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+                    <!--OS Add  Modal-->
+                    <div class="modal fade modal-add-os" id="add-os" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content new-post-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Add OS Name</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                              <form method=POST>
+                                  {% csrf_token %}
+                                  <label>OS <span style="color:red">*</span></label>
+                                  <input rows="10" class="form-control os-name" id="os-name" name="os-name"></input>
+
+                                  <br>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-success add-os" id="add-os" value="Save">Submit</button>
+                                  </div>
+                              </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--OS Add  Modal End-->
+                    
+                    <!--OS Version Add Modal-->
+                    <div class="modal fade modal-add-os-version" id="add-os-version" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content new-post-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Add OS Version</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                              <form method=POST>
+                                  {% csrf_token %}
+                                  <label>OS Version<span style="color:red">*</span></label>
+                                  <input rows="10" class="form-control os-version-name" id="os-version-name" name="os-version-name"></input>
+
+                                  <br>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-success add-os-version" id="add-os-version" value="Save">Submit</button>
+                                  </div>
+                              </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--OS Version Add Modal End-->            
+
+                    <!--Zone Add Modal-->
+                    <div class="modal fade modal-add-zone" id="add-zone" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content new-post-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Add Server Zone</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                              <form method=POST>
+                                  {% csrf_token %}
+                                  <label>Zone Name<span style="color:red">*</span></label>
+                                  <input rows="10" class="form-control zone" id="zone" name="zone"></input>
+
+                                  <br>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-success add-zone" id="add-zone" value="Save">Submit</button>
+                                  </div>
+                              </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--Zone Add Modal End-->      
+                    <!--project Add Modal-->
+                    <div class="modal fade modal-add-project" id="add-project" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content new-post-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Add Project</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                              <form method=POST>
+                                  {% csrf_token %}
+                                  <label >Project Name<span style="color:red">*</span></label>
+                                  <input rows="10" class="form-control project" id="project" name="project"></input>
+
+                                  <br>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-success add-project" id="add-project" value="Save">Submit</button>
+                                  </div>
+                              </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--project Add Modal End-->
+
+                    <!--Service Add Modal-->
+                    <div class="modal fade modal-add-service" id="add-service" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content new-post-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Add Service</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                              <form method=POST id="service-modal">
+                                {% if service_add_form.non_field_errors %}
+                                <div class="alert alert-danger" role="alert">
+                                  {% for error in service_add_form.non_field_errors %}
+                                    {{ error }}
+                                  {% endfor %}
+                                </div>
+                                {% endif %} 
+                                  {% csrf_token %}
+                                  <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                      {{ service_add_form.service_name.label_tag }}
+                                      {{ service_add_form.service_name.errors }}
+                                      {{ service_add_form.service_name|add_class:'form-control form-control-sm' }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                      {{ service_add_form.service_type.label_tag }}
+                                      {{ service_add_form.service_type.errors }}
+                                      {{ service_add_form.service_type|add_class:'form-control form-control-sm' }}
+                                      <a href="#" data-toggle="modal" data-target="#add-service-type"><small>Add Service Type</small></a>
+                                    </div>
+                                  </div>
+                                  <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                      {{ service_add_form.service_group.label_tag }}
+                                      {{ service_add_form.service_group.errors }}
+                                      {{ service_add_form.service_group|add_class:'form-control form-control-sm' }}
+                                      <a href="#" data-toggle="modal" data-target="#add-service-group"><small>Add Service Group</small></a>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                      {{ service_add_form.service_ip.label_tag }}
+                                      {{ service_add_form.service_ip.errors }}
+                                      {{ service_add_form.service_ip|add_class:'form-control form-control-sm' }}
+                                    </div>
+
+                                  </div>
+                                  <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                      {{ service_add_form.service_file_loc.label_tag }}
+                                      {{ service_add_form.service_file_loc.errors }}
+                                      {{ service_add_form.service_file_loc|add_class:'form-control form-control-sm' }}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                      {{ service_add_form.service_owner.label_tag }}
+                                      {{ service_add_form.service_owner.errors }}
+                                      {{ service_add_form.service_owner|add_class:'form-control form-control-sm' }}
+                                    </div>
+                                  </div>
+                                  <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                      {{ service_add_form.comment.label_tag }}
+                                      {{ service_add_form.comment.errors }}
+                                      {{ service_add_form.comment|add_class:'form-control form-control-sm' }}
+                                    </div>
+                                  </div>
+                                  <br>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-success add-service" id="add-service" value="Save">Submit</button>
+                                  </div>
+                              </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--Service Add Modal End-->       
+                    <!--Service Type Add Modal-->
+                    <div class="modal fade modal-add-service-type" id="add-service-type" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content new-post-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Add Service Type</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                              <form method=POST>
+                                  {% csrf_token %}
+                                  <label >Service Type<span style="color:red">*</span></label>
+                                  <input rows="10" class="form-control service-type" id="service-type" name="service-type"></input>
+
+                                  <br>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-success add-service-type" id="add-service-type" value="Save">Submit</button>
+                                  </div>
+                              </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--Service Type Add Modal End-->      
+                    <!--Service Group Add Modal-->
+                    <div class="modal fade modal-add-service-group" id="add-service-group" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content new-post-content">
+                          <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLongTitle">Add Service Group</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                          </button>
+                          </div>
+                          <div class="modal-body">
+                              <form method=POST>
+                                  {% csrf_token %}
+                                  <label >Service Group<span style="color:red">*</span></label>
+                                  <input rows="10" class="form-control service-group" id="service-group" name="service-group"></input>
+
+                                  <br>
+                                  <div class="modal-footer">
+                                      <button class="btn btn-success add-service-group" id="add-service-group" value="Save">Submit</button>
+                                  </div>
+                              </form>
+                          </div>
+                      </div>
+                      </div>
+                    </div>
+                    <!--Service Group Add Modal End-->                              
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+
+  <!-- XDSoft DateTimePicker -->
+  <script src="{% static 'plugins/xdsoft/jquery.datetimepicker.full.min.js'%}"></script>
+  <script src="{% static 'js/samrat.js'%}"></script>
+
+  <script>
+    $(function () {
+      $("#id_server_receive_date").datetimepicker({
+        format: 'Y-m-d',timepicker:false,mask:false,
+      });
+      $("#id_warranty_expiry_date").datetimepicker({
+        format: 'Y-m-d',timepicker:false,mask:false,
+      });
+  
+    });
+  </script>
+{% endblock javascripts %}

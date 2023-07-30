@@ -1,0 +1,137 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Edit Password {% endblock %} 
+
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container">
+            <div class="profile-body">
+                <div class="col-md-6 mt-4" style="margin:0 auto;">
+                  <h3 class="text-center border-bottom">Edit Password</h3>
+                      <form method="POST" enctype="multipart/form-data">
+                          {% csrf_token %}
+
+                            {% if errors %}
+                                {% if form.errors %}
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                        <div class="alert alert-danger" role="alert">
+                                            {{ errors }}
+                                        </div>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+
+
+                            {% if pass_edit_form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                              {% for error in pass_edit_form.non_field_errors %}
+                                {{ error }}
+                              {% endfor %}
+                            </div>
+                            {% endif %}
+                            <div class="form-row">
+                              <div class="form-group col-md-6">
+                                {{ pass_edit_form.old_master_key_name.label_tag }}
+                                {{ pass_edit_form.old_master_key_name.errors }}
+                                {{ pass_edit_form.old_master_key_name|add_class:'form-control form-control-sm' }}
+                              </div>
+                              <div class="form-group col-md-6">
+                                {{ pass_edit_form.old_master_key.label_tag }}
+                                <span style="color:red">*</span>
+                                {{ pass_edit_form.old_master_key.errors }}
+                                {{ pass_edit_form.old_master_key|add_class:'form-control form-control-sm' }}
+                              </div>
+                            </div>
+                            <div class="form-row">
+                              <div class="form-group col-md-12">
+                                {{ pass_edit_form.change_master_key.label_tag }}
+                                {{ pass_edit_form.change_master_key.errors }}
+                                {{ pass_edit_form.change_master_key }}
+                              </div>
+                            </div>
+                            <div class="form-row" id="new_masterkey_div">
+                                <div class="form-group col-md-6">
+                                  {{ pass_edit_form.new_master_key_name.label_tag }}
+                                  <span style="color:red">*</span>
+                                  {{ pass_edit_form.new_master_key_name.errors }}
+                                  {{ pass_edit_form.new_master_key_name|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ pass_edit_form.new_master_key.label_tag }}
+                                  <span style="color:red">*</span>
+                                  {{ pass_edit_form.new_master_key.errors }}
+                                  {{ pass_edit_form.new_master_key|add_class:'form-control form-control-sm' }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ pass_edit_form.site_server_name.label_tag }}
+                                  <span style="color:red">*</span>
+                                  {{ pass_edit_form.site_server_name.errors }}
+                                  {{ pass_edit_form.site_server_name|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ pass_edit_form.ip_or_url.label_tag }}
+                                  <span style="color:red">*</span>
+                                  {{ pass_edit_form.ip_or_url.errors }}
+                                  {{ pass_edit_form.ip_or_url|add_class:'form-control form-control-sm' }}
+                                </div>
+                              </div>
+                              <div class="form-row">
+                                <div class="form-group col-md-6">
+                                  {{ pass_edit_form.username.label_tag }}
+                                  <span style="color:red">*</span>
+                                  {{ pass_edit_form.username.errors }}
+                                  {{ pass_edit_form.username|add_class:'form-control form-control-sm' }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                  {{ pass_edit_form.password.label_tag }}
+                                  <span style="color:red">*</span>
+                                  {{ pass_edit_form.password.errors }}
+                                  {{ pass_edit_form.password|add_class:'form-control form-control-sm' }}
+                                </div>
+                              </div>
+                              <div class="form-row">
+                                <div class="form-group col-md-12">
+                                  {{ pass_edit_form.remark.label_tag }}
+                                  {{ pass_edit_form.remark.errors }}
+                                  {{ pass_edit_form.remark|add_class:'form-control form-control-sm' }}
+                                </div>
+                              </div>
+
+                          <div class="border-top pt-2">
+                              <button type="submit" class="btn btn-success btn-block">Submit</button>
+                          </div>
+                      </form>                                        
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'js/samrat.js'%}"></script>
+<script>
+  $("#id_change_master_key").prop("checked", false);
+  $("#new_masterkey_div").hide();
+
+  $('#id_change_master_key').click(function(){
+        if ($(this).is(':checked')){
+            $("#new_masterkey_div").show();
+        }
+        else{
+             $("#id_new_master_key").html('');
+             $("#new_masterkey_div").hide();
+        }
+    });
+</script>
+{% endblock javascripts %}

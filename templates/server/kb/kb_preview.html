@@ -1,0 +1,169 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} KB - {{kb.title}} {% endblock %} 
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'plugins/ocean/ocean.css' %}">
+<script src="{% static 'plugins/highligh.js/highlight.min.js' %}"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<div class="page-body">
+  <div class="container">
+      <div class="profile-body mt-2">
+        <h2>{{kb.title}}</h2>
+        <hr>
+
+        <div class="row">
+          <div class="col-lg-9">
+            <div class="row pl-2 pr-2">
+              <div class="d-flex ml-2">
+                <div class="">
+                  <b>Published:</b> 
+                  {% now "Y" as current_year %}
+                  {% if kb.created_at|date:"Y" == current_year %}
+                    {{kb.created_at|date:"N d"}}
+                  {% else %}
+                    {{kb.created_at|date:"N d Y"}}
+                  {% endif %}
+                  </div>
+                <div class=""><b>&nbsp;|&nbsp;Category:</b><a href="/kb/?cat={{kb.topic.title}}"> {{kb.topic.title}}</a></div>
+                {% if kb.related_service.all %}
+                  <div class=""><b>&nbsp;|&nbsp;Related Service:</b>
+                    {% for i in kb.related_service.all %}
+                    <a href="#" data-toggle="modal" data-target="#view-service-{{i.id}}">{{i.service_name}}</a>,
+                    <!--Service Type Add Modal-->
+                    <div class="modal fade modal-view-service" id="view-service-{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content new-post-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Service Detail</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        Service Name:
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        {{i.service_name}}
+                                    </div>
+                                  </div>
+
+                                  <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        Service Type:
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        {{i.service_type.service_type_name}}
+                                    </div>
+                                  </div>
+                                 
+                                 
+                                {% if i.service_ip %}
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            Service IP:
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            {{i.service_ip}}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if i.service_file_loc %}
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            Service File Location:
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            {{i.service_file_loc}}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        Service Owner:
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        {{i.service_owner}}
+                                    </div>
+                                </div>
+                                 
+
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <!--Service Type Add Modal End-->
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                <div class=""><b>&nbsp;|&nbsp;Read Time:</b>
+                  {{kb.get_readtime}}
+                </div>
+              </div>
+            </div>
+            <hr>
+            {{kb.body|safe}}
+            <div class="d-flex justify-content-between">
+              <div class="">
+                <b>Tags:</b>
+                {% for tag in kb.tags.all  %}
+                <a href="/kb/?tag={{tag.slug}}"><span class="badge" style="background-color:gray; color:white">{{tag.name}}</span></a>
+                {% endfor %}
+              </div>
+              <div class="">
+                Views: 
+                {{kb.kbviews_set.all.count}}
+              </div>
+            </div>
+            <hr>
+            <div class="blog-author">
+              <h2>Author</h2>
+              <div class="card p-3">
+                <div class="d-flex align-items-center">
+                  <div class="image"> 
+                    <img src="{{kb.author.profile.image.url}}" class="rounded" width="155"> 
+                  </div>
+                  <div class="ml-3 w-100">
+                    <h4 class="mb-0 mt-0">{{kb.author.get_full_name}}</h4> 
+                    <span>{{kb.author.profile.designation}}</span>
+
+                    <div class="row ml-1">
+                      <div class="col-md-9 p-2 mt-2 d-flex bg-info justify-content-between rounded stats border-success text-white">
+                        <div class="d-flex flex-column"> 
+                          <span class="articles">{{kb.author.profile.bio}}</span> 
+                        </div>
+                      </div> 
+
+                      <div class="col-md-3 p-2 mt-2 d-flex bg-success justify-content-between rounded text-white stats">
+                        <div class="d-flex flex-column"> 
+                          <span class="articles">Contribution</span> 
+                          <span class="number1"><a href="/kb/?author={{kb.author.id}}" style="color:white">{{contribution}}</a></span> 
+                        </div>
+                        <div class="d-flex flex-column"> 
+
+                        </div>
+
+                      </div>                   
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+          </div>
+          {% include './kb_right_side_detail.html' %}
+
+        </div>  
+{% endblock %}
+
+{% block javascripts %}
+
+{% endblock javascripts %}

@@ -1,0 +1,154 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Rack View {% endblock %} 
+
+{% block stylesheets %}
+
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="page-body">
+    <div class="container-fluid">
+        <div class="profile-body">
+          <div class="col-md-4 mt-2 pb-2 " style="margin:0 auto;">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+                <div class="row">
+                  <div class="col-md-12">
+                    <strong>Select Rack:</strong>
+                    <select class="form-select form-select-sm" name="server_rack" id="multiple-checkboxes1" multiple="multiple">
+                      <option value="all">All</option>
+                      {% for all_rack in all_racks %}
+                        <option value="{{all_rack}}">{{all_rack}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>                            
+                </div>
+                <div class="row">
+                  <div class="col-md-12 pt-2">
+                    <button name="show" type="submit" class="btn btn-success btn-block">Show</button>
+                  </div>
+                </div>
+
+            </form>                                        
+          </div>
+          <div class="row d-flex" id="rack_container">
+
+          </div>
+        </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+  <script src="{% static 'plugins/popper/popper.min.js'%}"></script>
+  <script src="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js'%}"></script>
+  <script src="{% static 'plugins/raphael/raphael.min.js' %}"> </script>
+  <script>
+    $(document).ready(function() {
+      $('#multiple-checkboxes1').bsMultiSelect({
+        placeholder:'All',
+      });
+    });
+  </script>
+  <script> 
+    var data = JSON.parse('{{ servers|escapejs }}');
+    var u_height = 15;
+    var rack_width = 250;
+
+    for(var m=0; m<data.length; m++){
+      var iDiv = document.createElement('div');
+      iDiv.className = 'col-lg-4 col-sm-12 col-md-6';
+      var rackDiv = document.createElement('div');
+      rackDiv.id = 'container'+m;
+      iDiv.appendChild(rackDiv);
+      document.getElementById('rack_container').appendChild(iDiv);
+
+    }
+    for(var n=0; n<data.length; n++){
+      var paper = Raphael("container"+n, 300, 700);
+      
+      var rect1 = paper.rect(20, u_height*2, rack_width, u_height*42+5).attr({ 
+        fill: "#FFF", 
+        stroke: "#000", 
+        "stroke-width": 5 
+        });
+
+      for(var x in data[n]){
+        var text2 = paper.text(150, 15,data[n][x][5]+" "+"Rack "+data[n][x][1]).attr({
+          "font-size": "14px", 
+          "font-weight": "600", 
+          fill: "black", stroke:"", 
+          "stroke-width": ""
+        });
+        var u_number = data[n][x][2]
+        var rev_u_number = 42-u_number;
+        var ff = data[n][x][3]
+        
+
+        if(ff == 1){
+          u_height2 = u_height;
+          u_len = 30;
+          u_len_txt = 37;
+        }
+        else if(ff == 2){
+          u_height2 = u_height*2;
+          u_len = 15;
+          u_len_txt = 29;
+        }
+        else if(ff == 3){
+          u_height2 = u_height*3;
+          u_len = 0;
+          u_len_txt = 24;
+        }
+        else if(ff == 4){
+          u_height2 = u_height*4;
+          u_len = -15;
+          u_len_txt = 16;
+        }
+        else if(ff == 5){
+          u_height2 = u_height*5;
+          u_len = -30;
+          u_len_txt = 10;
+        }
+
+
+        var rect2 = paper.rect(20, (rev_u_number*u_height)+u_len, rack_width, u_height2).attr({ 
+          fill: "0-#959292:20-#676565:20-#959292", 
+          stroke: "#000", 
+          href:"/server/view_single_server/"+data[n][x][4],
+          "stroke-width": 3 
+        }); 
+        var text1 = paper.text(150, rev_u_number*u_height+u_len_txt,data[n][x][0]).attr({
+          "font-size": "12px", 
+          "font-weight": "600", 
+          fill: "white", stroke:"", 
+          "stroke-width": ""
+        });
+
+        var cir1 = paper.circle(40, rev_u_number*u_height+u_len_txt, 3).attr({ 
+          fill: "r(0.25, 0.75)#fff-#E20022", 
+          stroke: "#E20022", 
+          "stroke-width": 0 
+        });
+        var cir2 = paper.circle(55, rev_u_number*u_height+u_len_txt, 3).attr({ 
+          fill: "r(0.25, 0.75)#fff-#01BD62", 
+          stroke: "#01BD62", 
+          "stroke-width": 0 
+        });  
+      }
+
+      j=42
+      for(i=u_height*2;i<=u_height*42+u_height;i=i+u_height){
+        var c = paper.path("M3 "+i+"L20 "+ i);
+        var text1 = paper.text(7,i+7.5, j)
+        j=j-1
+      }
+      
+    }
+
+    </script> 
+{% endblock javascripts %}

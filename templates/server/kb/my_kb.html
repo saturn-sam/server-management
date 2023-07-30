@@ -1,0 +1,190 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load random_numbers %}
+{% load crispy_forms_tags %}
+{% block title %} My KB List {% endblock %} 
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="page-body">
+  <div class="container">
+      <div class="profile-body mt-2">
+
+        <div class="row">
+          <div class="col-lg-9">
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="card-title">My Knowledge</h5>
+                </div>
+                <div class="card-body">
+                    <table id="example3" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Title</th>
+                                <th>Preview</th>
+                                <th>Publish Status</th>
+                                <th>Views</th>
+                                <th>Action</th>
+                                <th>Share With</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for kb in kbs %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td><a href="{% url 'kb-details' kb.id kb.slug %} ">{{kb.title}}</a></td>
+                                <td><a href="{% url 'kb-preview' kb.id kb.slug %} ">View</a></td>
+                                <td>{{kb.status}}</td>
+                                <td>{{kb.kbviews_set.all.count}}</td>
+                                <td>
+                                    <a href="{% url 'edit-kb' kb.id kb.slug %}">
+                                        <i class="far fa-money-check-edit"></i>
+                                    </a>  
+                                    {% if kb.status == 'protected' %}
+                                        <a href="#" data-toggle="modal" data-target="#share-with-{{kb.id}}"><i class="fas fa-share-square"></i></a>
+
+                                        <div class="modal fade modal-share-with" id="share-with-{{kb.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content new-post-content">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">Share with</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                </div>
+                                                <div class="modal-body">
+
+                                                    <form method=POST id="share-user-form-{{kb.id}}">
+                                                        {% csrf_token %}
+                                                        
+                                                        <input class="sharable-kb-id" name="kb-id" type="hidden" value="{{kb.id}}"></input>
+                                                        <label>Select User: </label>
+                                                        <div class="form-row">
+                                                            <div class="form-group col-md-12">
+                                                                <select id="select_share_user" class="form-select form-select-sm" name="share-user">
+                                                                    <option value="">------</option>
+                                                                    {% for sharable_user in kb.users_except_shared %}
+                                                                        
+                                                                        <option value="{{sharable_user.id}}">{{sharable_user.get_full_name}}</option>
+                                                                        
+                                                                    
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-success add-share-user" id="add-share-user" value="Save" data-kbid="{{kb.id}}">Submit</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    
+                                </td>
+                                <td>
+                                    {% if kb.status == 'protected' %}
+                                    
+                                    <a href="#" data-toggle="modal" data-target="#shared-with-{{kb.id}}">
+                                        {{kb.shared_with.all.count}}
+                                    </a>
+
+                                    <div 
+                                        class="modal fade modal-share-with" 
+                                        id="{% if kb.shared_with.all.count > 0 %}shared-with-{{kb.id}}{% endif %}"
+                                        tabindex="-1" 
+                                        role="dialog" 
+                                        aria-labelledby="exampleModalCenterTitle" 
+                                        aria-hidden="true">
+
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content new-post-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLongTitle">Shared with</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                            <div class="modal-body">
+
+                                                <form method=POST id="unshare-user-form-{{kb.id}}">
+                                                    {% csrf_token %}
+                                                    
+                                                    <input class="unshare-kb-id" name="kb-id" type="hidden" value="{{kb.id}}"></input>
+                                                    <div class="form-row">
+                                                        <div class="form-group col-md-12">
+                                                            <div class="form-check">            
+                                                                {% for shared_user in kb.shared_with.all %}
+                                                                    <div>
+                                                                        <input class="form-check-input checkbox-{{kb.id}}" type="checkbox" value="{{shared_user.id}}" id="flexCheckChecked">
+                                                                        {{shared_user.get_full_name}}
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-success unshare-user" id="unshare-user" value="Save" data-kbid="{{kb.id}}">Unshare User</button>
+                                                        <button class="btn btn-warning" data-dismiss="modal">Close</button>
+                                                        
+                                                    </div>
+                                                    
+                                                </form>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+          </div>
+          {% include './kb_right_side.html' %}
+        </div>  
+{% endblock %}
+{% block javascripts %}
+<script src="{% static 'plugins/popper/popper.min.js'%}"></script>
+<script src="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js'%}"></script>
+
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+<script src="{% static 'js/samrat.js'%}"></script>
+<script>
+    $(function () {
+    $('#example3').DataTable({
+        // "scrollY": 300,
+        "scrollX": true,
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": false,
+        "info": true,
+        "autoWidth": false,
+        "responsive": false,
+    });
+    });
+
+$(document).ready(function() {
+    $('#multiple-checkboxes2').bsMultiSelect({
+        placeholder:'Select User',
+    });
+});
+</script>
+
+{% endblock javascripts %}

@@ -1,0 +1,67 @@
+{% extends "server/layouts/base-fullscreen.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} Registration {% endblock %} 
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} login-page {% endblock body_class %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'dashboard/plugins/fontawesome-free/css/all.min.css' %}">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="{% static 'dashboard/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'dashboard/css/adminlte.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dashboard/css/samrat.css' %}">
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="login-box" style="padding-top: 200px;">
+
+    <div class="login-logo">
+      <a class="text-white"><b>Pubali Bank Ltd.</b></a>
+    </div>
+
+    <div class="card">
+      <div class="card-body register-card-body">
+        <form class="form-signin" action="" method="post" name="login_form">
+        {% csrf_token %}
+            <h1 class="h3 mb-3 font-weight-normal" style="text-align: center"> Sign Up</h1>
+            
+              {{ form| crispy }}
+              {% if request.GET.next %}
+                  <input type="hidden" name="next" value="{{ request.GET.next }}">
+              {% endif %}
+              
+              <div class="form-group">
+                <button type="submit" class="btn btn-success btn-block">Submit</button>
+              </div>
+              <hr>
+           
+        </form>
+        
+          
+          <a class="pl-4 pb-3" href="{% url 'login' %}">Have account? Login.</a>
+      </div>
+    </div>
+
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <!-- jQuery -->
+  <script src="{% static 'dashboard/plugins/jquery/jquery.min.js' %}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{% static 'dashboard/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+{% endblock javascripts %}

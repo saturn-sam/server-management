@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>PBL - Service Monitoring</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="refresh" content="10">
+        <!-- CSS only -->
+        <link rel="stylesheet" href="{% static 'plugins/bootstrap431/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'plugins/fontawesome-pro/css/all.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    </head>
+    <body>
+        <div class="container-fluid">
+            <h1 class="text-center">Pubali Bank Service Monitoring</h1>
+            <p class="text-center">Monitoring Enabled: {{monitoring_enabled_count}}, Monitoring: {{service_in_monitoring_count}}</p>
+            <div class="flex-container wrap" >
+
+            {% for service in services %}
+
+                {% if service.is_log_time_gt_five_min %}
+                    <div class="card text-white bg-warning m-2" style="width: 10rem;">
+                        <div class="card-body p-1">
+                            <p class="card-title"><a class="text-white" href="{% url 'view-single-service' service.service.id %}" target="_blank">{{service.service}}</a></p>
+                        <p class="card-text">Status: <i class="fas fa-unlink"></i></p>
+                        {{service.service.monitoring_enabled}}
+                        </div>
+                    </div>
+                {% else %}
+                    {% if service.is_mod_time_gt_five_min %}
+                        <div class="card text-white bg-danger m-2" style="width: 10rem;">
+                            <div class="card-body p-1">
+                                <p class="card-title"><a class="text-white" href="{% url 'view-single-service' service.service.id %}" target="_blank">{{service.service}}</a></p>
+                            <p class="card-text">Status: <i class="fas fa-chevron-double-down"></i></p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card text-white bg-success m-2" style="width: 10rem;">
+                            <div class="card-body p-1">
+                                <p class="card-text"><a class="text-white" href="{% url 'view-single-service' service.service.id %}" target="_blank">{{service.service}}</a></p>
+                            <p class="card-text">Status: <i class="fas fa-chevron-double-up"></i></p>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+            {% endfor %}
+
+            </div>
+        </div>
+
+        
+        <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    </body>
+</html>

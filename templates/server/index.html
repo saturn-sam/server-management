@@ -1,0 +1,126 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% block title %} Home {% endblock %} 
+
+{% block stylesheets %}
+
+
+{% endblock stylesheets %}
+
+{% block content %}
+  
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        {% comment %}
+        <h1 class="m-0 text-dark">Dashboard</h1>
+        {% endcomment %}
+      </div>
+    </div>
+  </div>
+</div>
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-info">
+          <div class="inner">
+            <h3>{{total_user}}</h3>
+            <p>Total User</p>
+          </div>
+          <div class="icon">
+            <i class="fas fa-user-friends"></i>
+          </div>
+          <a href="#" class="small-box-footer">&nbsp;</a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+          <div class="inner">
+            <h3>{{total_physical_server}} </h3>
+
+            <p>Total Physical Server</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-server" aria-hidden="true"></i>
+          </div>
+          <a href="{% url 'view-server' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-gray">
+          <div class="inner">
+            <h3>{{total_vm}}</h3>
+
+            <p>Total Virtual Server </p>
+          </div>
+          <div class="icon">
+            <i class="fas fa-cubes"></i>
+          </div>
+          <a href="{% url 'view-vm' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-lightblue">
+          <div class="inner">
+            <h3>{{total_service}}</h3>
+
+            <p>Total Service </p>
+          </div>
+          <div class="icon">
+            <i class="fas fa-code"></i>
+          </div>
+          <a href="{% url 'view-service' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-indigo">
+          <div class="inner">
+            <h3>{{total_kb}}</h3>
+
+            <p>Total Knowledge </p>
+          </div>
+          <div class="icon">
+            <i class="far fa-book-open"></i>
+          </div>
+          <a href="{% url 'kb-home' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-teal">
+          <div class="inner">
+            <h3>{{total_kb_topic}}</h3>
+
+            <p>Total KB Topics </p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-tasks" aria-hidden="true"></i>
+          </div>
+          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-red">
+          <div class="inner">
+            <h3>{{active_license}}/{{expired}}</h3>
+
+            <p>Active/Expired license </p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-file-certificate" aria-hidden="true"></i>
+          </div>
+          <a href="{% url 'view-license' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+
+{% block javascripts %}
+
+{% endblock javascripts %}
+
+

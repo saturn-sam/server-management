@@ -1,0 +1,98 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Add Private Task {% endblock %} 
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/xdsoft/jquery.datetimepicker.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="page-body">
+    <div class="container">
+        <div class="profile-body">
+            <div class="col-md-8" style="margin:0 auto;">
+                <form method="POST" enctype="multipart/form-data" >
+                    {% csrf_token %}
+                    {% for hidden_field in task_add_form.hidden_fields %}
+                      {{ hidden_field }}
+                    {% endfor %}
+                
+
+                    <fieldset class="form-group pt-3">
+                      <h3 class="text-center">Add Private Task</h3>
+
+                      {% if task_add_form.non_field_errors %}
+                      <div class="alert alert-danger" role="alert">
+                        {% for error in task_add_form.non_field_errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}                          
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                {{ task_add_form.task_title.label_tag }}
+                                <span style="color:red">*</span>
+                                {{ task_add_form.task_title.errors }}
+                                {{ task_add_form.task_title|add_class:'form-control form-control-sm' }}
+                            </div>
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{ task_add_form.due_date.label_tag }}
+                                <span style="color:red">*</span>
+                                {{ task_add_form.due_date.errors }}
+                                {{ task_add_form.due_date|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ task_add_form.reference_task.label_tag }}
+                                {{ task_add_form.reference_task.errors }}
+                                {{ task_add_form.reference_task|add_class:'form-control form-control-sm' }}
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                {{ task_add_form.description.label_tag }}
+                                <span style="color:red">*</span>
+                                {{ task_add_form.description.errors }}
+                                {{ task_add_form.description|add_class:'form-control form-control-sm' }}
+                            </div>
+                        </div>
+
+                    </fieldset>
+                    <div class="form-group">
+                        <button class="btn btn-success btn-block" type="submit">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+  <!-- XDSoft DateTimePicker -->
+  <script src="{% static 'plugins/xdsoft/jquery.datetimepicker.full.min.js'%}"></script>
+  <script src="{% static 'js/samrat.js'%}"></script>
+
+  <script>
+    $(function () {
+      $("#id_due_date").datetimepicker({
+        format: 'Y-m-d H:i:s',
+        timepicker:true,
+        mask:true,
+        defaultTime: '23:59',
+      });
+    });
+  </script>
+
+{% endblock javascripts %}

@@ -1,0 +1,171 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% block title %} View M365 License {% endblock %} 
+
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="profile-body">
+            <div class="row mt-3" >
+
+                <div class="col-md-4 border p-3" style="margin:0 auto;">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                            <fieldset class="form-group">
+                                <h5>Filter License</h5>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>License Type:<span style="color:red">*</span></strong>
+                                        <select name="l_type" id="multiple-checkboxes1" class="form-control form-control-sm" multiple="multiple">
+                                            {% for license in license_type %}
+                                            <option value="{{license.id}}">{{license.type_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Validity:</strong>
+                                        <select name="l_validity" id="multiple-checkboxes2" class="form-control form-control-sm" multiple="multiple">
+                                            <option value="1">Active</option>
+                                            <option value="0">Expired/Deactive</option>
+                                        </select>
+                                    </div>
+                                </div><br>
+                                
+                            
+                            </fieldset>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input class="btn btn-success btn-block" type="submit" value="show" name="show">
+                            </div>
+                            <div class="col-md-6">
+                                <input class="btn btn-success btn-block" type="submit" value="download" name="download">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+            {% if licenses %}
+            <section class="col-lg-12 connectedSortable">
+                <table id="example3" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>SL</th>
+                            <th>License Name</th>
+                            <th>License Number</th>
+                            <th>Effective Quantity</th>
+                            <th>License Type</th>
+                            <th>Service Name</th>
+                            <th>Service Group</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Validity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for license in licenses %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{license.license_name}}</td>
+                            <td> 
+                                {% if license.license_number %}
+                                    {{license.license_number}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if license.effective_quantity %}
+                                    {{license.effective_quantity}}
+                                {% endif %} 
+                            </td>
+                            <td>
+                                {% if license.license_type %}
+                                    {{license.license_type}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if license.service_name %}
+                                    {{license.service_name}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if license.service_group %}
+                                    {{license.service_group}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if license.start_date %}
+                                    {{license.start_date}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if license.end_date %}
+                                    {{license.end_date}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if license.license_status == 1 %}
+                                    Active
+                                {% else %}
+                                    Expired
+                                {% endif %}
+                            </td>
+                            <td><a href="{% url 'edit-license' license.id %}">Edit</a></td>
+                            
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/popper/popper.min.js'%}"></script>
+<script src="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js'%}"></script>
+
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+
+<script>
+    $(function () {
+    $('#example3').DataTable({
+        // "scrollY": 300,
+        "scrollX": true,
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": false,
+        "info": true,
+        "autoWidth": false,
+        "responsive": false,
+    });
+    });
+
+    $(document).ready(function() {
+        $('#multiple-checkboxes1').bsMultiSelect({
+          placeholder:'All',
+        });
+    });
+    $(document).ready(function() {
+        $('#multiple-checkboxes2').bsMultiSelect({
+          placeholder:'All',
+        });
+    });
+</script>
+
+{% endblock javascripts %}
