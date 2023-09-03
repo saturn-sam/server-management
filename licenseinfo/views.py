@@ -286,105 +286,140 @@ def add_m365_license(request):
         return render(request, 'server/license/m365_add.html', context)
     
 def view_m365_license(request):
-    if request.method == 'POST':
-        if 'show' in request.POST:
-            l_type = request.POST.getlist('l_type')
-            l_validity = request.POST.getlist('l_validity')
 
-            if not l_type:
-                l_type = LicenseType.objects.filter(delete_status=False)
+    licenses = M365License.objects.filter(delete_status=False).order_by('branch')
 
-            if not l_validity:
-                l_validity = [0,1]
+    if not licenses:
+        messages.warning(request,"No data found.")
 
-            licenses = LicenseInfo.objects.filter(delete_status=False, license_type__in=l_type, license_status__in=l_validity).order_by('license_type')
+    total_used_license = LicenseType.objects.filter(delete_status=False).count()
+    context={
+        'total_used_license':total_used_license,
+        'licenses':licenses
+    }
+    return render(request, 'server/license/m365_view.html', context) 
 
-            if not licenses:
-                messages.warning(request,"No data found.")
+    # if request.method == 'POST':
+    #     if 'show' in request.POST:
+    #         l_type = request.POST.getlist('l_type')
+    #         l_validity = request.POST.getlist('l_validity')
 
-            license_type = LicenseType.objects.filter(delete_status=False)
-            context={
-                'license_type':license_type,
-                'licenses':licenses
-            }
-            return render(request, 'server/license/license_view.html',context)
+    #         if not l_type:
+    #             l_type = LicenseType.objects.filter(delete_status=False)
 
-        if 'download' in request.POST:
-            l_type = request.POST.get('l_type')
-            l_validity = request.POST.get('l_validity')
+    #         if not l_validity:
+    #             l_validity = [0,1]
 
-            if not l_type:
-                l_type = LicenseType.objects.filter(delete_status=False)
+    #         licenses = LicenseInfo.objects.filter(delete_status=False, license_type__in=l_type, license_status__in=l_validity).order_by('license_type')
 
-            if not l_validity:
-                l_validity = [0,1]
+    #         if not licenses:
+    #             messages.warning(request,"No data found.")
 
-            licenses = LicenseInfo.objects.filter(delete_status=False, license_type__in=l_type, license_status__in=l_validity).order_by('license_type')
+    #         license_type = LicenseType.objects.filter(delete_status=False)
+    #         context={
+    #             'license_type':license_type,
+    #             'licenses':licenses
+    #         }
+    #         return render(request, 'server/license/license_view.html',context)
 
-            if not licenses:
-                messages.warning(request,"No data found.")
-                license_type = LicenseType.objects.filter(delete_status=False)
-                context={
-                    # 're_form':LicenseFilterForm(),
-                    'license_type':license_type
-                }
-                return render(request, 'server/license/license_view.html', context) 
-            else:
-                response = HttpResponse(content_type='application/ms-excel')
-                response['Content-Disposition'] = 'attachment; filename="license_info.xls"'
+    #     if 'download' in request.POST:
+    #         l_type = request.POST.get('l_type')
+    #         l_validity = request.POST.get('l_validity')
 
-                wb = xlwt.Workbook(encoding='utf-8')
-                ws = wb.add_sheet('sheet 1')
-                row_num = 2
+    #         if not l_type:
+    #             l_type = LicenseType.objects.filter(delete_status=False)
 
-                columns = ['SL.', 'License Name', 'License Number', 'Effective Quantity', 'License Type', 'Service Name', 'Service Group', 'Start Date', 'End Date', 'Validity']
+    #         if not l_validity:
+    #             l_validity = [0,1]
 
-                style = xlwt.easyxf('font: bold on,height 320;align: wrap on,vert centre, horiz center;')
-                ws.write_merge(0, 1, 0, len(columns)-1, 'License Information', style)
+    #         licenses = LicenseInfo.objects.filter(delete_status=False, license_type__in=l_type, license_status__in=l_validity).order_by('license_type')
 
-                style_column = xlwt.easyxf('font: bold on;align: wrap on,vert centre, horiz center;')
+    #         if not licenses:
+    #             messages.warning(request,"No data found.")
+    #             license_type = LicenseType.objects.filter(delete_status=False)
+    #             context={
+    #                 # 're_form':LicenseFilterForm(),
+    #                 'license_type':license_type
+    #             }
+    #             return render(request, 'server/license/license_view.html', context) 
+    #         else:
+    #             response = HttpResponse(content_type='application/ms-excel')
+    #             response['Content-Disposition'] = 'attachment; filename="license_info.xls"'
 
-                for col_num in range(len(columns)):
-                    ws.write(2, col_num, columns[col_num], style_column)
+    #             wb = xlwt.Workbook(encoding='utf-8')
+    #             ws = wb.add_sheet('sheet 1')
+    #             row_num = 2
+
+    #             columns = ['SL.', 'License Name', 'License Number', 'Effective Quantity', 'License Type', 'Service Name', 'Service Group', 'Start Date', 'End Date', 'Validity']
+
+    #             style = xlwt.easyxf('font: bold on,height 320;align: wrap on,vert centre, horiz center;')
+    #             ws.write_merge(0, 1, 0, len(columns)-1, 'License Information', style)
+
+    #             style_column = xlwt.easyxf('font: bold on;align: wrap on,vert centre, horiz center;')
+
+    #             for col_num in range(len(columns)):
+    #                 ws.write(2, col_num, columns[col_num], style_column)
                 
-                font_style = xlwt.easyxf('align: wrap on,vert centre;')
-                rows = licenses
-                for row in rows:
-                    row_num += 1
-                    local_start = localize(timezone.localtime(row.start_date))
-                    local_end = localize(timezone.localtime(row.end_date))
-                    if row.license_status == 1:
-                        license_status = 'Valid'
-                    else:
-                        license_status = 'Expired'
+    #             font_style = xlwt.easyxf('align: wrap on,vert centre;')
+    #             rows = licenses
+    #             for row in rows:
+    #                 row_num += 1
+    #                 local_start = localize(timezone.localtime(row.start_date))
+    #                 local_end = localize(timezone.localtime(row.end_date))
+    #                 if row.license_status == 1:
+    #                     license_status = 'Valid'
+    #                 else:
+    #                     license_status = 'Expired'
 
-                    if row.service_name:
-                        service_name = row.service_name.service_name
-                    else:
-                        service_name = ''
-                    if row.service_group:
-                        service_group = row.service_group.service_group_name
-                    else:
-                        service_group = ''
+    #                 if row.service_name:
+    #                     service_name = row.service_name.service_name
+    #                 else:
+    #                     service_name = ''
+    #                 if row.service_group:
+    #                     service_group = row.service_group.service_group_name
+    #                 else:
+    #                     service_group = ''
                     
-                    ws.write(row_num, 0, row_num, font_style)
-                    ws.write(row_num, 1, row.license_name, font_style)
-                    ws.write(row_num, 2, row.license_number, font_style)
-                    ws.write(row_num, 3, row.effective_quantity, font_style)
-                    ws.write(row_num, 4, row.license_type.type_name, font_style)
-                    ws.write(row_num, 5, service_name, font_style)
-                    ws.write(row_num, 6, service_group, font_style)
-                    ws.write(row_num, 7, local_start, font_style)
-                    ws.write(row_num, 8, local_end, font_style)
-                    ws.write(row_num, 9, license_status, font_style)
-                wb.save(response)
-                return response
+    #                 ws.write(row_num, 0, row_num, font_style)
+    #                 ws.write(row_num, 1, row.license_name, font_style)
+    #                 ws.write(row_num, 2, row.license_number, font_style)
+    #                 ws.write(row_num, 3, row.effective_quantity, font_style)
+    #                 ws.write(row_num, 4, row.license_type.type_name, font_style)
+    #                 ws.write(row_num, 5, service_name, font_style)
+    #                 ws.write(row_num, 6, service_group, font_style)
+    #                 ws.write(row_num, 7, local_start, font_style)
+    #                 ws.write(row_num, 8, local_end, font_style)
+    #                 ws.write(row_num, 9, license_status, font_style)
+    #             wb.save(response)
+    #             return response
 
-    else:
-        license_type = LicenseType.objects.filter(delete_status=False)
+    # else:
+    #     license_type = LicenseType.objects.filter(delete_status=False)
 
-        context={
-            # 're_form':LicenseFilterForm(),
-            'license_type':license_type
-        }
-        return render(request, 'server/license/license_view.html', context) 
+    #     context={
+    #         # 're_form':LicenseFilterForm(),
+    #         'license_type':license_type
+    #     }
+    #     return render(request, 'server/license/license_view.html', context) 
+
+
+
+def delete_m365_license(request):
+    if request.method == 'POST':
+        if request.POST["license_id"]:
+            license_id = request.POST["license_id"]
+            license_ins = get_object_or_404(M365License, pk=license_id)
+            print('ok')
+            if license_ins:
+                if license_ins.created_by != request.user:
+                    return JsonResponse({"status":"error","message": f"You are not authorized to delete the license entry."})  
+                license_ins.delete_status = True
+                license_ins.deleted_date = timezone.now()
+                license_ins.deleted_by = request.user
+                license_ins.save()
+                return JsonResponse({"status":"success","message": f"License info Has been deleted Successfully!"})
+                #messages.success(request, 'License info Has been deleted Successfully!')
+                #return redirect('view-m365-license')
+
+        else:
+            return JsonResponse({"status":"error","message": f"Something went wrong. Contact with adminstrator."}) 

@@ -667,4 +667,35 @@ document.addEventListener('DOMContentLoaded', function() {
     })
 })
 
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-license-btn').forEach(function(button) {
+        button.onclick = function(e) {
+            e.preventDefault()
+            var entry_id = button.dataset.passid;
+            //form_id = "#delete-license-form-"+entry_id
+            $.ajax({
+                type: "POST",
+                url: `/license/delete-m365-license`,
+                data: {
+                    csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                    license_id: entry_id
+                },
+                success: function(data1) {
+                    
+                    if (data1.status == "error"){
+                        toastr.error(data1.message);
+                    }
+                    else if (data1.status == "success"){
+                        btn_id = '#delete-btn-'+entry_id
+                        $('.delete-license').modal('hide')
+                        $(btn_id).empty()
+                        
+
+                        toastr.success(data1.message);
+                    }
+                }
+                })
+        }
+    });
+ });
 

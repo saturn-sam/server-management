@@ -16,4 +16,5 @@ urlpatterns = [
         path('edit-license/<int:pk>', views.edit_license, name='edit-license'),
         path('add-m365-license', views.add_m365_license, name='add-m365-license'),
         path('view-m365-license', views.view_m365_license, name='view-m365-license'),
+        path('delete-m365-license', views.delete_m365_license, name='delete-m365-license'),
 ]

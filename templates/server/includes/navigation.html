@@ -26,6 +26,7 @@
             <li><a class="dropdown-item" href="{% url 'view-license-summary' %}">View Active License Summary</a></li>
             <div class="dropdown-divider"></div>
             <li><a class="dropdown-item" href="{% url 'add-m365-license' %}">Add M365 License Info</a></li>
+            <li><a class="dropdown-item" href="{% url 'view-m365-license' %}">View M365 License Info</a></li>
           </ul>
         </li>
         {% if request.user.email == 'a@a.com' or request.user.email == 'samrat.ict@pubalibankbd.com' or request.user.email == 'sazedur.ict@pubalibankbd.com' %}
