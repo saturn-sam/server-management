@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'monitoring',
     'pass_manager',
     'licenseinfo',
+    'incidence_log',
 
     'crispy_forms',
     'taggit',

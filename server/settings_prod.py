@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'knowledgebase',
     'pass_manager',
     'licenseinfo',
+    'incidence_log',
     
     'crispy_forms',
     'taggit',

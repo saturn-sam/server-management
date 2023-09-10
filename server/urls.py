@@ -29,6 +29,7 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('monitoring/', include('monitoring.urls')),
     path('license/', include('licenseinfo.urls')),
+    path('incidence/', include('incidence_log.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
