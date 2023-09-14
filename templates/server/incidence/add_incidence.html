@@ -1,0 +1,96 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Add M365 License Info {% endblock %} 
+
+{% block stylesheets %}
+  <!-- XDSoft DateTimePicker -->
+  <link rel="stylesheet" href="{% static 'plugins/xdsoft/jquery.datetimepicker.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="container">
+        <div class="col-md-8 mt-4" style="margin:0 auto;">
+          <h3 class="text-center border-bottom">Add Incidence</h3>
+              <form method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                      {% for error in form.non_field_errors %}
+                        {{ error }}
+                      {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                          {{ form.title.label_tag }}<span style="color:red">*</span>
+                          <span style="color:red">{{ form.title.errors }}</span>
+                          {{ form.title|add_class:'form-control form-control-sm' }}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        {{ form.urgency.label_tag }}<span style="color:red">*</span>
+                        <span style="color:red">{{ form.urgency.errors }}</span>
+                        {{ form.urgency|add_class:'form-control form-control-sm' }}
+                      </div>
+                      <div class="form-group col-md-6">
+                        {{ form.impact.label_tag }}<span style="color:red">*</span>
+                        <span style="color:red">{{ form.impact.errors }}</span>
+                        {{ form.impact|add_class:'form-control form-control-sm' }}
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        {{ form.status.label_tag }}<span style="color:red">*</span>
+                        <span style="color:red">{{ form.status.errors }}</span>
+                        {{ form.status|add_class:'form-control form-control-sm' }}
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        {{ form.reported_by.label_tag }}<span style="color:red">*</span>
+                        <span style="color:red">{{ form.reported_by.errors }}</span>
+                        {{ form.reported_by|add_class:'form-control form-control-sm' }}
+                      </div>
+                      <div class="form-group col-md-6">
+                        {{ form.assigned_to.label_tag }}<span style="color:red">*</span>
+                        <span style="color:red">{{ form.assigned_to.errors }}</span>
+                        {{ form.assigned_to|add_class:'form-control form-control-sm' }}
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        {{ form.incidence_description.label_tag }}<span style="color:red">*</span>
+                        <span style="color:red">{{ form.incidence_description.errors }}</span>
+                        {{ form.incidence_description|add_class:'form-control form-control-sm' }}
+                      </div>
+                    </div>
+
+                  <div class="border-top pt-4">
+                      <button type="submit" class="btn btn-success btn-block">Submit</button>
+                  </div>  
+              </form>  
+        </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+
+  <!-- XDSoft DateTimePicker -->
+  <script src="{% static 'plugins/xdsoft/jquery.datetimepicker.full.min.js'%}"></script>
+
+  <script src="{% static 'js/samrat.js'%}"></script>
+  <script>
+    $(function () {
+      $("#id_date").datetimepicker({
+        format: 'Y-m-d',timepicker:false,mask:false,
+      });
+  
+    });
+  </script>
+{% endblock javascripts %}
