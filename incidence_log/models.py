@@ -1,17 +1,20 @@
 from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
+from django.utils.translation import ugettext_lazy as _
+
 from django.conf import settings
 
 from knowledgebase.models import KnowledgeBase
+from taskmanager.models import *
 
 # Create your models here.
 
 class Incidence(models.Model):
     """Model for incidents happed"""
     class URGENCY_LEVEL(models.IntegerChoices):
-        LOW = 0, 'Low'
-        MEDIUM = 1, 'Medium'
-        HIGH = 2, 'High'
+        LOW = 1, 'Low'
+        MEDIUM = 2, 'Medium'
+        HIGH = 3, 'High'
     
     class IMPACT_LEVEL(models.IntegerChoices):
         CRITICAL = 1, 'High'
@@ -19,23 +22,27 @@ class Incidence(models.Model):
         MINOR = 3, 'Low'
 
     class STATUS(models.IntegerChoices):
-        TRIGGERED = 1, 'Triggered'
-        ACKNOWLEDGED = 2, 'Acknowledged'    
+        TRIGGERED = 1, 'Triggered'    
         RESOLVED = 3, 'Resolved'   
 
-    title = models.CharField(max_length=255, null=False,blank=True)
-    urgency = models.IntegerField(choices=URGENCY_LEVEL.choices, default=URGENCY_LEVEL.LOW, null=False,blank=True)
-    impact = models.IntegerField(choices=IMPACT_LEVEL.choices, default=IMPACT_LEVEL.MINOR, null=False,blank=True)
-    status = models.IntegerField(choices=STATUS.choices, default=STATUS.TRIGGERED, null=False,blank=True)
-    incidence_description = RichTextUploadingField(blank=True, null=True)
+    title = models.CharField(max_length=255, null=True,blank=True)
+    urgency = models.IntegerField(choices=URGENCY_LEVEL.choices, default=URGENCY_LEVEL.LOW, null=True,blank=True)
+    impact = models.IntegerField(choices=IMPACT_LEVEL.choices, default=IMPACT_LEVEL.MINOR, null=True,blank=True)
+    status = models.IntegerField(choices=STATUS.choices, default=STATUS.TRIGGERED, null=True,blank=True)
+    related_kb = models.ManyToManyField(KnowledgeBase, help_text = "(KB about Incidence and Resolution Description.)", blank=True)
+    related_task = models.ForeignKey(TaskManager, on_delete=models.SET_NULL, null=True, blank=True, related_name="incidence_reported_by_user")
+    delete_status = models.IntegerField(blank=False, default=0)
     reported_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="incidence_reported_by_user")
-    assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="incidence_assigned_to_user", blank=True)
+    resolved_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="incidence_resolved_by_user", blank=True)
+    added_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="incidence_added_by_user")
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="incidence_updated_by_user")
     deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="incidence_deleted_by_user")
     triggered_time = models.DateTimeField(blank=True, null=True)
     responsed_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    delete_status = models.IntegerField(blank=False, default=0)
+    resolved_at = models.DateTimeField(blank=True, null=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
 
@@ -45,21 +52,3 @@ class Incidence(models.Model):
     # def get_absolute_url(self):
     #     return reverse("core:detailIncident", args=[self.id])
 
-
-class Resolution(models.Model):
-    """Model for incidence resolution"""
-    incidence = models.OneToOneField(Incidence, on_delete=models.CASCADE, related_name="resolution")
-    resolution = RichTextUploadingField(blank=True, null=True)
-    related_kb = models.ManyToManyField(KnowledgeBase)
-    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="resolution_resolved_by_user")
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="resolution_created_by_user")
-    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="resolution_updated_by_user")
-    delete_status = models.IntegerField(blank=False, default=0)
-    deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="resolution_deleted_by_user")
-    created_at = models.DateTimeField(auto_now_add=True)
-    resolved_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.incidence}"

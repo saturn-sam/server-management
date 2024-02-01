@@ -7,6 +7,7 @@
 {% block stylesheets %}
   <!-- XDSoft DateTimePicker -->
   <link rel="stylesheet" href="{% static 'plugins/xdsoft/jquery.datetimepicker.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js' %}">
 {% endblock stylesheets %}
 
 {% block content %}
@@ -16,7 +17,7 @@
           <h3 class="text-center border-bottom">Add Incidence</h3>
               <form method="POST" enctype="multipart/form-data">
                   {% csrf_token %}
-
+                    {{ form.media  }}
                     {% if form.non_field_errors %}
                     <div class="alert alert-danger" role="alert">
                       {% for error in form.non_field_errors %}
@@ -24,6 +25,7 @@
                       {% endfor %}
                     </div>
                     {% endif %}
+                    <!-- Incidence Block Start -->
                     <div class="form-row">
                         <div class="form-group col-md-12">
                           {{ form.title.label_tag }}<span style="color:red">*</span>
@@ -44,10 +46,20 @@
                       </div>
                     </div>
                     <div class="form-row">
-                      <div class="form-group col-md-6">
+                      <div class="form-group col-md-4">
                         {{ form.status.label_tag }}<span style="color:red">*</span>
                         <span style="color:red">{{ form.status.errors }}</span>
                         {{ form.status|add_class:'form-control form-control-sm' }}
+                      </div>
+                      <div class="form-group col-md-4">
+                        {{ form.triggered_time.label_tag }}<span style="color:red">*</span>
+                        <span style="color:red">{{ form.triggered_time.errors }}</span>
+                        {{ form.triggered_time|add_class:'form-control form-control-sm' }}
+                      </div>
+                      <div class="form-group col-md-4">
+                        {{ form.responsed_at.label_tag }}<span style="color:red">*</span>
+                        <span style="color:red">{{ form.responsed_at.errors }}</span>
+                        {{ form.responsed_at|add_class:'form-control form-control-sm' }}
                       </div>
                     </div>
                     <div class="form-row">
@@ -57,18 +69,39 @@
                         {{ form.reported_by|add_class:'form-control form-control-sm' }}
                       </div>
                       <div class="form-group col-md-6">
-                        {{ form.assigned_to.label_tag }}<span style="color:red">*</span>
+                        {{ form.assigned_to.label_tag }}
                         <span style="color:red">{{ form.assigned_to.errors }}</span>
                         {{ form.assigned_to|add_class:'form-control form-control-sm' }}
                       </div>
                     </div>
                     <div class="form-row">
-                      <div class="form-group col-md-6">
-                        {{ form.incidence_description.label_tag }}<span style="color:red">*</span>
-                        <span style="color:red">{{ form.incidence_description.errors }}</span>
-                        {{ form.incidence_description|add_class:'form-control form-control-sm' }}
+                      <div class="form-group col-md-12">
+                        {{ form.related_kb.label_tag }}<span style="color:red">*</span>
+                        <small style="font-style: italic; ">{{ form.related_kb.help_text }}</small>
+                        <span style="color:red">{{ form.related_kb.errors }}</span>
+                        {{ form.related_kb|add_class:'form-control form-control-sm' }}
+                        <a href="{% url 'add-kb' %}" target="_blank"><small>Add New KB</small></a>
                       </div>
                     </div>
+                    <!-- Incidence Block End -->
+
+                    <!-- Resolution Block Start -->
+                    <div id="resolved_div">
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            {{ form.resolved_by.label_tag }}<span style="color:red">*</span>
+                            <span style="color:red">{{ form.resolved_by.errors }}</span>
+                            {{ form.resolved_by|add_class:'form-control form-control-sm' }}
+                          </div>
+                          <div class="form-group col-md-6">
+                            {{ form.resolved_at.label_tag }}<span style="color:red">*</span>
+                            <span style="color:red">{{ form.resolved_at.errors }}</span>
+                            {{ form.resolved_at|add_class:'form-control form-control-sm' }}
+                          </div>
+                        </div>
+
+                    </div>
+                    <!-- Resolution Block End -->
 
                   <div class="border-top pt-4">
                       <button type="submit" class="btn btn-success btn-block">Submit</button>
@@ -80,17 +113,51 @@
 {% endblock content %}
 
 {% block javascripts %}
-
+  <script src="{% static 'plugins/popper/popper.min.js'%}"></script>
   <!-- XDSoft DateTimePicker -->
   <script src="{% static 'plugins/xdsoft/jquery.datetimepicker.full.min.js'%}"></script>
-
+  <script src="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js'%}"></script>
   <script src="{% static 'js/samrat.js'%}"></script>
   <script>
     $(function () {
-      $("#id_date").datetimepicker({
-        format: 'Y-m-d',timepicker:false,mask:false,
+      $("#id_triggered_time").datetimepicker({
+        format: 'Y-m-d H:m:s',timepicker:true,mask:false,
       });
-  
+      $("#id_resolved_at").datetimepicker({
+        format: 'Y-m-d H:m:s',timepicker:true,mask:false,
+      });
+      $("#id_responsed_at").datetimepicker({
+        format: 'Y-m-d H:m:s',timepicker:true,mask:false,
+      });
     });
   </script>
+
+<script>
+  $(document).ready(function() {
+      $('#id_assigned_to').bsMultiSelect({
+        placeholder:'Select',
+      });
+      $('#id_resolved_by').bsMultiSelect({
+        placeholder:'Select',
+      });
+  });
+</script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("#id_status").on('change', function() {
+
+      $(this).find("option:selected").each(function() {
+        var selected = $(this).attr("value");
+        console.log(selected)
+        if (selected == 3) {
+          $("#resolved_div").show();
+        } else {
+          $("#resolved_div").hide();
+        }
+
+      });
+    }).change();
+  });
+</script>
 {% endblock javascripts %}

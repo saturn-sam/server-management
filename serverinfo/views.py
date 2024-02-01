@@ -482,7 +482,7 @@ def edit_service(request, pk):
 
 @login_required
 def view_server(request):
-    server_list = PhysicalServer.objects.filter(delete_status=False)
+    server_list = PhysicalServer.objects.filter(delete_status=False).order_by('server_rack_info__location','server_name')
     context={
         "server_list": server_list,
     }

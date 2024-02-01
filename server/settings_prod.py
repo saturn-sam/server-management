@@ -74,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'server.middleware.SessionTimeoutMiddleware',
 ]
 
 ROOT_URLCONF = 'server.urls'
@@ -96,8 +97,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'server.wsgi.application'
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 10 * 60
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+#SESSION_COOKIE_AGE = 10 * 60
+
+# Set the session timeout to 10 minutes (in seconds)
+# SESSION_COOKIE_AGE = 2*60
+
+# Save the session on every request to update the timeout
+# SESSION_SAVE_EVERY_REQUEST = True
+
+
+
 
 
 

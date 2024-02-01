@@ -16,15 +16,16 @@ class TaskManager(models.Model):
     assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="tm_assigned_by")
     due_date = models.DateTimeField(blank=False, null=False)
     completed_date = models.DateTimeField(blank=True, null=True)
+    task_from_incidence = models.BooleanField(default=False)
     task_status = models.IntegerField(blank=False, default=1) # 1 incomplete, 2 complete, 3 incomplete pause, 4 Canceled
     # task_steps_commentary = models.TextField(blank=True)
     task_steps_commentary = models.ManyToManyField('TaskStepComentary', related_name="tmcommentary")
     task_procedure_or_kb = models.ManyToManyField(KnowledgeBase)
     # subtask = models.ManyToManyField('TaskManager', related_name="tmsubtask", null=True, blank=True)
     reference_task = models.ForeignKey('TaskManager', on_delete=models.SET_NULL, related_name="reftask", null=True, blank=True)
-    task_visibility = models.IntegerField(blank=True, null=True)
+    task_visibility = models.IntegerField(blank=True, null=True) # 1 for public, 2 for private 
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="taskmanager_created_by_user")
-    created_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
     delete_status = models.IntegerField(blank=False, default=0)
     deleted_at = models.DateTimeField(blank=True, null=True)
     deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="taskmanager_deleted_by_user")
