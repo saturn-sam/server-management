@@ -29,8 +29,7 @@
             <li><a class="dropdown-item" href="{% url 'view-m365-license' %}">View M365 License Info</a></li>
           </ul>
         </li>
-        {% if request.user.email == 'a@a.com' or request.user.email == 'samrat.ict@pubalibankbd.com' or request.user.email == 'sazedur.ict@pubalibankbd.com' %}
-          
+
         
         <li><a href="#">Password Manager</a>
           <ul>
@@ -49,7 +48,13 @@
             <li><a class="dropdown-item" href="{% url 'search-task' %}">Search Task</a></li>
           </ul>
         </li>
-        {% endif %}
+        <li><a href="#">Incidence Manager</a>
+          <ul>
+            <li><a class="dropdown-item" href="{% url 'add-incidence' %}">Add Incidence</a></li>
+            <li><a class="dropdown-item" href="{% url 'incidence-list' %}">View All Pending Incidence</a></li>
+            <div class="dropdown-divider"></div>
+          </ul>
+        </li>
       </ul>
     </li>
 

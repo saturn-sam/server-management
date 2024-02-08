@@ -60,6 +60,8 @@
                               
                               {% if task_details.assigned_by == request.user and task_details.task_status == 1 %}
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#assignment-change" >Change Assignment</a>
+                              {% else %}
+                                <span class="dropdown-item text-secondary" href="#">Change Assignment</span>
                               {% endif %}
 
                               {% if task_details.task_status == 1 %}
@@ -595,12 +597,19 @@
                   {% csrf_token %}
                   <label>Status <span style="color:red">*</span></label>
                   <input type="hidden" value="{{task_details.id}}" class="form-control task_id" id="task_id" name="task_id"></input>
+                  
                   <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="status_id">
                     <option selected disabled>Select</option>
+                    {% if task_details.task_from_incidence %}
+                    <option value="2" {% if  task_details.task_status == 2 %} disabled {% endif %}>Mark Resolved</option>
+                    {% else %}
+
                     <option value="2" {% if  task_details.task_status == 2 %} disabled {% endif %}>Complete</option>
+                    
                     <option value="1" {% if  task_details.task_status == 1 %} disabled {% endif %}>Unpause/Incomplete</option>
                     <option value="3" {% if  task_details.task_status == 3 %} disabled {% endif %}>Pause</option>
                     <option value="4" {% if  task_details.task_status == 4 %} disabled {% endif %}>Cancel</option>
+                    {% endif %}
                   </select>
 
                   <br>

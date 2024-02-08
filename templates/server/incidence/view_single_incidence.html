@@ -1,0 +1,863 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Task T-{{task_details.id}} {% endblock %} 
+
+
+{% block stylesheets %}
+
+<link rel="stylesheet" href="{% static 'css/task-timeline.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/xdsoft/jquery.datetimepicker.min.css' %}">
+
+{% endblock stylesheets %}
+
+  
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row ml-5">
+    <div class="col-md-7 mt-4" style="margin:0 auto;">
+      <div class="card">
+        <div class="card-header">
+          <div class="form-row">
+            <div class="col-md-6">
+              <h5 >(I-{{incidence_details.id}}) 
+                {% if incidence_details.status == 1 and incidence_details.related_task.is_past_due %}
+                  <span style="color:#ff0000">Due date over</span> 
+                {% elif incidence_details.status == 1 and not incidence_details.related_task.is_past_due %}
+                  <span style="color:#ffa600cc">Incomplete</span> 
+                {% elif incidence_details.status == 3  %}
+                  <span style="color:green">Resolved</span> 
+                {% endif %}
+              </h5>
+            </div>
+            {% comment %}
+            <div class="col-md-6">
+              <div class="dropdown show">
+                <a class="btn btn-sm btn-secondary dropdown-toggle float-right" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Action
+                </a>
+              
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#add-comment">Add Comment</a>
+                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#status-change">Change Status</a>
+                  {% if task_details.task_visibility == 2 %}
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#visibility-change">Change Task Visibility</a>
+                  {%endif%}
+                  {% if task_details.task_status == 1 %}
+                    <a class="dropdown-item" href="#"  data-toggle="modal" data-target="#add-ref-task" >Add Ref. Task</a>
+                  {%endif%}
+                  
+                  {% if task_details.assigned_by == request.user and task_details.task_status == 1 %}
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#assignment-change" >Change Assignment</a>
+                  {% endif %}
+                  {% if task_details.task_status == 1 %}
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#change-due-date" >Change Due Date</a>
+                  {%endif%}
+                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#change-kb" >Add/Change KB</a>
+                </div>
+              </div>
+            </div>
+            {% endcomment %}
+          </div>
+        </div>
+        <div class="card-body">
+          <fieldset class="form-group pt-3">
+            <div class="form-row">
+              <div class="form-group col-md-12">
+                <div class="form-row">
+                  <div class="form-group col-md-2">
+                    <b>Incidence:</b>
+                  </div>
+                  <div class="form-group col-md-10">
+                    {{ incidence_details.title }}
+                  </div>
+                </div> 
+                
+                
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Description:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {% for kb in incidence_details.related_kb.all %}
+                    {% if kb.author == request.user or kb.status == 'published' %}
+                      <a href="{% url 'kb-details' kb.id kb.slug %}">{{ kb.title }}</a>,  
+                    {% endif %}
+                    {% endfor %}
+                  </div>
+                </div> 
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Status:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {{ incidence_details.get_status_display }}
+                  </div>
+                </div>
+                
+                
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Response Time:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {{ incidence_details.responsed_at }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Impact:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {{ incidence_details.get_impact_display }}
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-md-6">
+
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Urgency:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {{ incidence_details.get_urgency_display }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    {% if incidence_details.status == 3 %}
+                    <b>Resolved by:</b>
+                    {% else %}
+                    <b>Assigned To:</b>
+                    {% endif %}
+                  </div>
+                  <div class="form-group col-md-8">
+                    {% if incidence_details.status == 3 %}
+                      {% for resolved in incidence_details.resolved_by.all %}
+                        {{ resolved.get_full_name }},
+                      {% endfor %}
+                    {% else %}
+                      {% for assigned in incidence_details.assigned_to.all %}
+                        {{ assigned.get_full_name }},
+                      {% endfor %}
+                    {% endif %}
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Assigned By:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {{ incidence_details.reported_by.get_full_name }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Due Date:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {{ incidence_details.related_task.due_date }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Resolved Time:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {% if incidence_details.resolved_at %}
+                      {{ incidence_details.resolved_at }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Related task:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    <a href="{% url 'task-view' incidence_details.related_task.id %}">{{ incidence_details.related_task }}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>created by:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {{ incidence_details.added_by.get_full_name }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group col-md-6">
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <b>Created at:</b>
+                  </div>
+                  <div class="form-group col-md-8">
+                    {{ incidence_details.created_at }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </fieldset> 
+        </div>
+      </div>          
+    </div>
+    <div class="col-md-5 mt-4">
+      <div id="container">
+        <div class="row d-flex justify-content-center mb-70">
+          <div class="col-md-12">
+              <div class="main-card mb-3 card">
+                  <div class="card-body">
+                      <h5 class="card-title">Incidence Task Timeline</h5>
+                      <div class="vertical-timeline vertical-timeline--animate vertical-timeline--one-column">
+                        {% for task_history in task_histories %}
+                       
+                          <!--New Task Add-->
+                          {% if task_history.new_task_add %}
+                            <div class="vertical-timeline-item vertical-timeline-element">
+                                <div> 
+                                    <span class="vertical-timeline-element-icon bounce-in"> 
+                                      <i class="badge badge-dot-xl2 badge-primary">
+                                        <i class="fas fa-plus-square badge-icon text-white"></i>
+                                      </i>
+                                    </span>
+                                    <div class="vertical-timeline-element-content bounce-in">
+                                        <p>
+                                          New Incidence Task 
+                                          <a href="{% url 'task-view' task_history.task.id  %}">
+                                            <b>
+                                              T-{{task_history.task.id}}
+                                            </b>
+                                          </a> 
+                                          added by 
+                                          <b>
+                                            {{task_history.task.created_by.get_full_name}}
+                                          </b>
+                                        </p>
+                                        <div class="pl-3">
+                                          <i>
+                                            <b>
+                                              Description: 
+                                            </b>
+                                            {{task_history.task.description}}
+                                          </i>
+                                        </div>
+                                         <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                         
+                                    </div>
+                                </div>
+                            </div>
+                          {% endif %}
+                          <!--KB Add-->
+                          {% if task_history.task_procedure_or_kb.all %}
+                          <div class="vertical-timeline-item vertical-timeline-element">
+                              <div> 
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                    <i class="badge badge-dot-xl2 badge-primary">
+                                      <i class="fas 	fas fa-book-open badge-icon text-white"></i>
+                                    </i>
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                    
+                                      <p>
+                                        <b>
+                                          {{task_history.kb_insert_by.get_full_name}}
+                                        </b> 
+                                        added knowledge
+                                        
+                                        {% for kb in task_history.task_procedure_or_kb.all %}
+                                          {% if kb.author == request.user or kb.status == 'published' %}
+                                            <a href="{% url 'kb-details' kb.id kb.slug %}">KB{{ kb.id }}</a>,  
+                                          {% endif %}
+                                          
+                                        {% endfor %}
+                                        to 
+                                        Task 
+                                        <a href="{% url 'task-view' task_history.task.id  %}">
+                                          <b>
+                                            T-{{task_history.task.id}}
+                                          </b>
+                                        </a>
+                                      </p>
+                                      <span class="vertical-timeline-element-date">
+                                        {{task_history.effective_date|date:"M d, Y"}}
+                                        <br>
+                                        {{task_history.effective_date|date:"H:i"}}
+                                      </span>
+                                       
+                                  </div>
+                              </div>
+                          </div>
+                          {% endif %}
+                          <!--Assigned to/by Add-->
+                          {% if task_history.assigned_to.all %}
+                          <div class="vertical-timeline-item vertical-timeline-element">
+                              <div> 
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                    <i class="badge badge-dot-xl2 badge-primary">
+                                      <i class="fas fa-chart-network badge-icon text-white"></i>
+                                    </i>
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p>Task 
+                                        <a href="{% url 'task-view' task_history.task.id  %}">
+                                          <b>
+                                            T-{{task_history.task.id}}
+                                          </b>
+                                        </a> assigned to 
+                                        <b>
+                                          {% for assigned in task_history.assigned_to.all %}
+                                            {{assigned.get_full_name}},
+                                          {% endfor %}
+                                          
+                                        </b> 
+                                        by 
+                                        <b>
+                                          {{task_history.assigned_by.get_full_name}}
+                                        </b>
+                                      </p>
+                                      <span class="vertical-timeline-element-date">
+                                        {{task_history.effective_date|date:"M d, Y"}}
+                                        <br>
+                                        {{task_history.effective_date|date:"H:i"}}
+                                      </span>
+                                       
+                                  </div>
+                              </div>
+                          </div>
+                          {% endif %}
+                          <!--Ref Task Add-->
+                          {% if task_history.ref_task_add %}
+                          <div class="vertical-timeline-item vertical-timeline-element">
+                              <div> 
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                    <i class="badge badge-dot-xl2 badge-primary">
+                                      <i class="fas fa-link badge-icon text-white"></i>
+                                    </i>
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p>
+                                        Task 
+                                        <a href="{% url 'task-view' task_history.ref_task_add.id  %}">
+                                          <b>
+                                            T-{{task_history.ref_task_add.id}}
+                                          </b>
+                                        </a> 
+                                        added as reference of Task 
+                                        <a href="{% url 'task-view' task_history.task.id  %}">
+                                          <b>
+                                            T-{{task_history.task.id}}
+                                          </b>
+                                        </a> 
+                                        by 
+                                        <b>
+                                          {{task_history.insert_by.get_full_name}}
+                                        </b>
+                                        .
+                                      </p>
+                                       <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                       
+                                  </div>
+                              </div>
+                          </div>
+                          {% endif %}
+                          <!--Sub Task Add-->
+                          {% if task_history.sub_task_add %}
+                          <div class="vertical-timeline-item vertical-timeline-element">
+                              <div> 
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                    <i class="badge badge-dot-xl2 badge-primary">
+                                      <i class="fas fa-network-wired badge-icon text-white"></i>
+                                    </i>
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p>
+                                        Task 
+                                        <a href="{% url 'task-view' task_history.sub_task_add.id  %}">
+                                          <b>
+                                            T-{{task_history.sub_task_add.id}}
+                                          </b>
+                                        </a> 
+                                        added as Sub task of Task 
+                                        <a href="{% url 'task-view' task_history.task.id  %}">
+                                          <b>
+                                            T-{{task_history.task.id}}
+                                          </b>
+                                        </a> 
+                                        by 
+                                        <b>
+                                          {{task_history.insert_by.get_full_name}}
+                                        </b> 
+                                      </p>
+                                       <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                       
+                                  </div>
+                              </div>
+                          </div>
+                          {% endif %}
+                          <!--Comment Add-->
+                          {% if task_history.comment_add %}
+                          <div class="vertical-timeline-item vertical-timeline-element">
+                              <div> 
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                      <i class="badge badge-dot-xl2 badge-success"> 
+                                        <i class='far fa-comment-alt badge-icon text-white '></i> 
+                                      </i> 
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p>
+                                        {{task_history.comment_add.added_by.get_full_name}} added a comment.
+                                      </p>
+                                      <div class="pl-3">
+                                        <i><b>&ldquo;</b>{{task_history.comment_add.comment}}</i>
+                                      </div>
+                                       <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                       
+                                  </div>
+                              </div>
+                          </div>
+                          {% endif %}
+                          <!--due date-->
+                          {% if task_history.due_date %}
+                          <div class="vertical-timeline-item vertical-timeline-element">
+                              <div> 
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                      <i class="badge badge-dot-xl2 badge-warning">
+                                        <i class="fas fa-pennant badge-icon text-white"></i>
+                                      </i> 
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p>
+                                        Task Due date {% if task_history.due_date != 1 %}
+                                        {{task_history.due_date}} {% endif %} 
+                                        <b>
+                                          {{task_history.effective_date}}
+                                        </b> 
+                                        {% if task_history.due_date != 1 %} added by 
+                                          <b>
+                                            {{task_history.insert_by.get_full_name}}
+                                          </b> 
+                                        {% endif %}
+                                      </p>
+                                      
+                                       <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                       
+                                  </div>
+                              </div>
+                          </div>
+                          {% endif %}         
+                          
+                          <!--status changed-->
+                          {% if task_history.changed_status %}
+                          <div class="vertical-timeline-item vertical-timeline-element">
+                              <div> 
+                                <!--To Pause-->
+                                {% if task_history.changed_status == '3' %}
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                      <i class="badge badge-dot badge-dot-xl2 badge-warning"><i class="fas fa-pause badge-icon text-white "></i> </i> 
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p>
+                                        <b>
+                                          {{task_history.insert_by.get_full_name}} 
+                                        </b> 
+                                        <b class="text-danger">
+                                          Paused Task
+                                        </b> 
+                                        <a href="{% url 'task-view' task_history.task.id  %}">
+                                          <b>
+                                            T-{{task_history.task.id}}
+                                          </b>
+                                        </a>
+                                        . 
+                                      </p>
+                                      
+                                       <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                       
+                                  </div>
+                                  {% endif %}
+                                <!--To Incomplete-->
+                                {% if task_history.changed_status == '1' %}
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                      <i class="badge badge-dot badge-dot-xl2 badge-warning">
+                                        <i class="fas fa-play badge-icon text-white"></i> 
+                                      </i> 
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p>
+                                        <b>
+                                          {{task_history.insert_by.get_full_name}} 
+                                        </b> 
+                                        <b class="text-success">
+                                          Activated task
+                                        </b>  
+                                        <a href="{% url 'task-view' task_history.task.id  %}">
+                                          <b>
+                                            T-{{task_history.task.id}}
+                                          </b>
+                                        </a>
+                                        .
+                                      </p>
+                                      
+                                       <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                       
+                                  </div>
+                                  {% endif %}
+                                  
+                                  <!--To Complete-->
+                                  {% if task_history.changed_status == '2' %}
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                      <i class="badge badge-dot badge-dot-xl2 badge-success">
+                                        <i class="fas fa-check badge-icon text-white "></i> 
+                                      </i> 
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p><b>{{task_history.insert_by.get_full_name}} </b> marked task <a href="{% url 'task-view' task_history.task.id  %}"><b>T-{{task_history.task.id}}</b></a> <b class="text-success">Completed</b></p>
+                                      
+                                       <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                       
+                                  </div>
+                                  {% endif %}
+                                  <!--To Cancel-->
+                                  {% if task_history.changed_status == '4' %}
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                      <i class="badge badge-dot badge-dot-xl2 badge-danger">
+                                        <i class="fas fa-window-close badge-icon text-white"></i> 
+                                      </i> 
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p><b>{{task_history.insert_by.get_full_name}} </b> <b class="text-danger">Cancelled </b> task <a href="{% url 'task-view' task_history.task.id  %}"><b>{{task_history.task.id}}</b></a> </p>
+                                      
+                                       <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                       
+                                  </div>
+                                  {% endif %}
+                              </div>
+                          </div>
+                          {% endif %}  
+                          <!--Task Visibility-->
+                          {% if task_history.task_visibility == 1 %}
+                          <div class="vertical-timeline-item vertical-timeline-element">
+                              <div> 
+                                  <span class="vertical-timeline-element-icon bounce-in"> 
+                                      <i class="badge badge-dot-xl2 badge-success">
+                                        <i class="fa fa-eye badge-icon text-white"></i>
+                                      </i> 
+                                  </span>
+                                  <div class="vertical-timeline-element-content bounce-in">
+                                      <p>
+                                        <b>
+                                          {{task_history.insert_by.get_full_name}}
+                                        </b> 
+                                        changed the visibility of the task to <b>Public</b>
+                                      </p>
+                                      
+                                       <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                       
+                                  </div>
+                              </div>
+                          </div>
+                          {% endif %}  
+                        {% endfor %}
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!--Comment Add  Modal-->
+    <div class="modal fade modal-comment" id="add-comment" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content new-post-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Add comment to task T-{{task_details.id}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method=POST>
+                  {% csrf_token %}
+                  <label>Comment <span style="color:red">*</span></label>
+                  <input rows="10" class="form-control comment" id="comment" name="comment"></input>
+                  <input rows="10" type="hidden" value="{{task_details.id}}" class="form-control task_id" id="task_id" name="task_id"></input>
+
+                  <br>
+                  <div class="modal-footer">
+                      <button class="btn btn-success add-comment" id="add-comment" value="Save">Submit</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Comment Add  Modal End-->
+
+    <!--Status Change  Modal-->
+    <div class="modal fade modal-status-change" id="status-change" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content new-post-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Change status to task T-{{task_details.id}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method=POST>
+                  {% csrf_token %}
+                  <label>Status <span style="color:red">*</span></label>
+                  <input type="hidden" value="{{task_details.id}}" class="form-control task_id" id="task_id" name="task_id"></input>
+                  <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="status_id">
+                    <option selected disabled>Select</option>
+                    <option value="2" {% if  task_details.task_status == 2 %} disabled {% endif %}>Complete</option>
+                    <option value="1" {% if  task_details.task_status == 1 %} disabled {% endif %}>Unpause/Incomplete</option>
+                    <option value="3" {% if  task_details.task_status == 3 %} disabled {% endif %}>Pause</option>
+                    <option value="4" {% if  task_details.task_status == 4 %} disabled {% endif %}>Cancel</option>
+                  </select>
+
+                  <br>
+                  <div class="modal-footer">
+                      <button class="btn btn-success status-change-btn" id="status-change-btn" value="Save">Submit</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Status Change  Modal End-->
+
+    <!--Visibility Change  Modal-->
+    <div class="modal fade modal-visibility-change" id="visibility-change" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content new-post-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Change visibility to task T-{{task_details.id}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method=POST>
+                  {% csrf_token %}
+                  <label>Are you sure to change the visibility to public?</label>
+                  <input type="hidden" value="{{task_details.id}}" class="form-control task_id" id="task_id" name="task_id"></input>
+                  <br>
+                  <div class="modal-footer">
+                      <button class="btn btn-success visibility-change-btn" id="visibility-change-btn" value="Save">Ok</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Visibility Change  Modal End-->
+
+    <!--Assignment Change  Modal-->
+    <div class="modal fade modal-assignment-change" id="assignment-change" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content new-post-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Change Assignment to task T-{{task_details.id}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method=POST>
+                  {% csrf_token %}
+                  <label>Assign to <span style="color:red">*</span></label>
+                  <input type="hidden" value="{{task_details.id}}" class="form-control task_id" id="task_id" name="task_id"></input>
+                  <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="assigned_to" multiple>
+                    <option selected disabled>Select</option>
+                    {% for user in all_users %}
+                    <option value="{{user.id}}" {% if user in task_details.assigned_to.all %} selected {% endif %}>{{user.get_full_name}}</option>
+                    {% endfor %}
+                    
+
+                  </select>
+
+                  <br>
+                  <div class="modal-footer">
+                      <button class="btn btn-success assignment-change-btn" id="assignment-change-btn" value="Save">Submit</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Assignment Change Modal End-->
+
+    <!--Ref task add Modal-->
+    <div class="modal fade modal-add-ref-task" id="add-ref-task" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content new-post-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Change Reference Task of task T-{{task_details.id}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method=POST>
+                  {% csrf_token %}
+                  <label>Reference Task <span style="color:red">*</span></label>
+                  <input type="hidden" value="{{task_details.id}}" class="form-control task_id" id="task_id" name="task_id"></input>
+                  <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="ref_task">
+                    <option selected disabled>Select</option>
+                    {% for task in all_tasks %}
+                    <option value="{{task.id}}" {% if  task_details.reference_task == task or task_details == task or task in sub_tasks %} disabled {% endif %}>T-{{task.id}}</option>
+                    {% endfor %}
+                    
+
+                  </select>
+
+                  <br>
+                  <div class="modal-footer">
+                      <button class="btn btn-success add-ref-task-btn" id="add-ref-task-btn" value="Save">Submit</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Ref task add Modal End-->
+
+    <!--Due date change Modal-->
+    <div class="modal fade modal-change-due-date" id="change-due-date" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content new-post-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Change Due Date of task T-{{task_details.id}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method=POST>
+                  {% csrf_token %}
+                  <label>Due Date <span style="color:red">*</span></label>
+                  <input type="hidden" value="{{task_details.id}}" class="form-control task_id" id="task_id" name="task_id"></input>
+                  <input type="text" name="due_date" class="form-control form-control-sm" required id="due_date">
+
+                  <br>
+                  <div class="modal-footer">
+                      <button class="btn btn-success change-due-date-btn" id="change-due-date-btn" value="Save">Submit</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Due date change Modal-->
+
+    <!--KB change Modal-->
+    <div class="modal fade modal-change-kb" id="change-kb" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content new-post-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Change knowledge to T-{{task_details.id}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method=POST>
+                  {% csrf_token %}
+                  <label>Published KB <span style="color:red">*</span></label>
+                  <input type="hidden" value="{{task_details.id}}" class="form-control task_id" id="task_id" name="task_id"></input>
+                  <select class="form-select form-select-sm" aria-label=".form-select-sm example" id="kb" multiple>
+                    <option selected disabled>Select</option>
+                    {% for kb in kb_lists %}
+                    <option value="{{kb.id}}" {% if kb in task_details.task_procedure_or_kb.all  %}
+                      selected
+                    {% endif %}>KB{{kb.id}}</option>
+                    {% endfor %}
+                    
+
+                  </select>
+
+                  <br>
+                  <div class="modal-footer">
+                      <button class="btn btn-success change-kb-btn" id="change-kb-btn" value="Save">Submit</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--KB change Modal-->  
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'js/samrat.js'%}"></script>
+
+  <!-- XDSoft DateTimePicker -->
+  <script src="{% static 'plugins/xdsoft/jquery.datetimepicker.full.min.js'%}"></script>
+
+
+  <script>
+    $(function () {
+      $("#due_date").datetimepicker({
+        format: 'Y-m-d H:i:s',
+        timepicker:true,
+        mask:true,
+        defaultTime: '23:59',
+      });
+    });
+  </script>
+
+{% endblock javascripts %}

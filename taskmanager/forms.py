@@ -37,7 +37,7 @@ class TMCreateForm(ModelForm):
         # self.fields['assigned_to'] = UserFullnameChoiceField(queryset=CustomUser.objects.filter(is_active=True))
         self.fields['assigned_to'] = UserMultipleChoiceField(queryset=CustomUser.objects.filter(is_active=True).order_by('email'))
         self.fields['assigned_by'] = UserFullnameChoiceField(queryset=CustomUser.objects.filter(is_active=True))
-        self.fields['reference_task'] = UserMultipleChoiceField2(queryset=TaskManager.objects.filter(delete_status=0, task_visibility=1))
+        self.fields['reference_task'].queryset = TaskManager.objects.filter(delete_status=0, task_visibility=1)
         # print(CustomUser.objects.filter(pk = user.id))
         # self.fields['assigned_by'].initial = CustomUser.objects.filter(pk = user.id)
 

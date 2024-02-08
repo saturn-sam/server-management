@@ -12,14 +12,14 @@ class TaskManager(models.Model):
 
     task_title = models.CharField(max_length=255,blank=False)
     description = models.TextField(blank=False)
-    assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="tm_assigned_to")
+    assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="tm_assigned_to", null=True, blank=True)
     assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="tm_assigned_by")
     due_date = models.DateTimeField(blank=False, null=False)
     completed_date = models.DateTimeField(blank=True, null=True)
     task_from_incidence = models.BooleanField(default=False)
     task_status = models.IntegerField(blank=False, default=1) # 1 incomplete, 2 complete, 3 incomplete pause, 4 Canceled
     # task_steps_commentary = models.TextField(blank=True)
-    task_steps_commentary = models.ManyToManyField('TaskStepComentary', related_name="tmcommentary")
+    task_steps_commentary = models.ManyToManyField('TaskStepComentary', related_name="tmcommentary", blank=True)
     task_procedure_or_kb = models.ManyToManyField(KnowledgeBase)
     # subtask = models.ManyToManyField('TaskManager', related_name="tmsubtask", null=True, blank=True)
     reference_task = models.ForeignKey('TaskManager', on_delete=models.SET_NULL, related_name="reftask", null=True, blank=True)

@@ -3,6 +3,18 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 import datetime
 from .models import *
+from authentication.models import CustomUser
+
+class UserMultipleChoiceField(forms.ModelMultipleChoiceField):
+    """
+    Custom multiple select Feild with full name
+    """
+    def label_from_instance(self, obj):
+          return obj.get_full_name()
+
+class UserFullnameChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.get_full_name()
 
 class AddIncidenceForm(forms.ModelForm):
     class Meta:
@@ -21,6 +33,13 @@ class AddIncidenceForm(forms.ModelForm):
             'resolved_at'
         ]
 
+    def __init__(self, *args, **kwargs):
+        super(AddIncidenceForm, self).__init__(*args, **kwargs)
+        self.fields['related_kb'].queryset = KnowledgeBase.objects.filter(delete_status=False, status='published')
+        self.fields['assigned_to'] = UserMultipleChoiceField(queryset=CustomUser.objects.filter(is_active=True).order_by('email'), required=False)
+        self.fields['reported_by'] = UserFullnameChoiceField(queryset=CustomUser.objects.filter(is_active=True).order_by('email'))
+        self.fields['resolved_by'] = UserMultipleChoiceField(queryset=CustomUser.objects.filter(is_active=True).order_by('email'), required=False)
+
     def clean(self):
         
         current_time = timezone.now()
@@ -37,6 +56,10 @@ class AddIncidenceForm(forms.ModelForm):
         resolved_by = self.cleaned_data.get('resolved_by')
         resolved_at = self.cleaned_data.get('resolved_at')
         # print(type(current_time), '    ', type(triggered_time))
+        if not triggered_time:
+            raise ValidationError("Please Select Triggered time")
+        if not responsed_at:
+            raise ValidationError("Please Select Responsed at")
         if current_time < triggered_time or current_time < responsed_at:
             raise ValidationError("Time must not be greater than current time.")
         if resolved_at:

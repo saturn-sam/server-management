@@ -68,7 +68,7 @@
                         <span style="color:red">{{ form.reported_by.errors }}</span>
                         {{ form.reported_by|add_class:'form-control form-control-sm' }}
                       </div>
-                      <div class="form-group col-md-6">
+                      <div class="form-group col-md-6" id="assigned_to_div">
                         {{ form.assigned_to.label_tag }}
                         <span style="color:red">{{ form.assigned_to.errors }}</span>
                         {{ form.assigned_to|add_class:'form-control form-control-sm' }}
@@ -152,8 +152,12 @@
         console.log(selected)
         if (selected == 3) {
           $("#resolved_div").show();
+          $("#assigned_to_div").hide();
+
         } else {
           $("#resolved_div").hide();
+          $("#assigned_to_div").show();
+
         }
 
       });

@@ -20,6 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 
 from .sendMail import SendMail
+from incidence_log.views import update_incidence_status
 # Create your views here.
 
 @login_required
@@ -90,6 +91,8 @@ def task_create(request):
 
     }
     return render(request, 'server/taskmanager/task_add.html', context) 
+
+
 
 @login_required
 def private_task_create(request):
@@ -208,29 +211,34 @@ def search_task(request):
             task_assigned_by = CustomUser.objects.filter(is_active=True)
         if not task_status or 'all' in task_status:
             task_status = ['1','2','3','4']
-        # if not task_due or task_due:
-        #     if not task_due or 'all' in task_due:
-        #         # task_due = 'due_date >= timezone.now() '
-        if 'show' in request.POST:
-            task_query = TaskManager.objects.filter(delete_status=0, assigned_to__in = task_assigned_to, assigned_by__in = task_assigned_by, task_status__in = task_status).order_by('task_status','due_date')
-            task_query = task_query.filter(Q(delete_status=False) & ((Q(task_visibility=2) & Q(created_by=request.user)) | Q(task_visibility=1))).order_by('task_status','due_date')
 
-            if not task_query:
-                messages.warning(request, 'No result found based on the criteria!')
+        task_query = TaskManager.objects.filter(
+            delete_status=0, 
+            assigned_to__in = task_assigned_to, 
+            assigned_by__in = task_assigned_by, 
+            task_status__in = task_status
+            ).order_by('task_status','due_date').distinct()
+        # print(task_query)
+        task_query = task_query.filter(
+            Q(delete_status=False) & (
+                (Q(task_visibility=2) &
+                    Q(created_by=request.user)
+                ) | 
+                Q(task_visibility=1)
+            )
+            ).order_by('task_status','due_date')
+        
+        if not task_query:
+            messages.warning(request, 'No result found based on the criteria!')
+
+        if 'show' in request.POST:
             context = {
                 'all_users':all_users,
                 'task_query':task_query,
             }
             return render(request, 'server/taskmanager/task_report.html', context)
+        
         elif 'download' in request.POST:
-            task_query = TaskManager.objects.filter(delete_status=0, assigned_to__in = task_assigned_to, assigned_by__in = task_assigned_by, task_status__in = task_status).order_by('task_status','due_date')
-            task_query = task_query.filter(Q(delete_status=False) & ((Q(task_visibility=2) & Q(created_by=request.user)) | Q(task_visibility=1))).order_by('task_status','due_date')
-
-            if not task_query:
-                messages.warning(request, 'No result found based on the criteria!')
-            
-
-
             response = HttpResponse(content_type='application/ms-excel')
             response['Content-Disposition'] = 'attachment; filename="Task_Report.xls"'
 
@@ -368,8 +376,11 @@ def change_status(request):
             task = TaskManager.objects.get(pk=task_id)
             task.task_status = status_id
             
+            if task.task_from_incidence:
+                msg2 = update_incidence_status(request, task)
+
             if status_id == '2':
-                print(status_id)
+                # print(status_id)
                 task.completed_date = timezone.now()
             else:
                 task.completed_date = None
@@ -387,7 +398,10 @@ def change_status(request):
             elif status_id == '4':
                 msg = "Task has been cancelled successfully!"
 
-            return JsonResponse({"status":"success","message": msg})
+            if task.task_from_incidence:
+                return JsonResponse({"status":"success","message": msg + msg2})
+            else:
+                return JsonResponse({"status":"success","message": msg})
 
         else:
             return JsonResponse({"status":"error","message": f"Please fill the required fields."})

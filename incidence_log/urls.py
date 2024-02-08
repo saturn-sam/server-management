@@ -5,6 +5,8 @@ from . import views
 
 urlpatterns = [
 #    path('add_master_pass', views.add_master_pass, name='add_master_pass'),
-   path('add_incidence', views.add_incidence, name='add_incidence'),
+   path('add_incidence', views.add_incidence, name='add-incidence'),
+   path('incidence_list', views.incidence_list, name='incidence-list'),
+   path('incidence/<int:pk>/view/', views.view_incidence, name='view-incidence'),
 
 ]
