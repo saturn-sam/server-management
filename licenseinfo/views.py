@@ -265,14 +265,21 @@ def add_m365_license(request):
         m365_add_form = M365AddForm(request.POST)
 
         if m365_add_form.is_valid():
-            new_license = m365_add_form.save()
-            new_license.refresh_from_db()
-            new_license.created_by = request.user
-            new_license.update_by = request.user
+            try:
+                new_license = m365_add_form.save()
+                new_license.refresh_from_db()
+                new_license.created_by = request.user
+                new_license.update_by = request.user
 
-            new_license.save()
-            messages.success(request, 'License info Has been Added Successfully!')
-            return redirect('add-m365-license')
+                new_license.save()
+                messages.success(request, 'License info Has been Added Successfully!')
+                return redirect('add-m365-license')
+            except Exception as e:
+                messages.error(request, e)
+                context = {
+                    'license_add_form' : m365_add_form,
+                }
+                return render(request, 'server/license/m365_add.html', context)
         else:
             context = {
                 'license_add_form' : m365_add_form,

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'monitoring',
     'pass_manager',
     'licenseinfo',
+    'incidence_log',
 
     'crispy_forms',
     'taggit',
@@ -77,6 +78,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'server.middleware.SessionTimeoutMiddleware',
 ]
 
 ROOT_URLCONF = 'server.urls'
@@ -99,8 +101,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'server.wsgi.application'
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 30 * 60
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# SESSION_COOKIE_AGE = 30 * 60
+
+
+# Set the session timeout to 10 minutes (in seconds)
+# SESSION_COOKIE_AGE = 2*60
+
+# Save the session on every request to update the timeout
+# SESSION_SAVE_EVERY_REQUEST = True
 
 
 
@@ -193,6 +202,12 @@ EMAIL_PORT = "25"
 # EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
 DEFAULT_FROM_EMAIL = "server.monitor@pubalibankbd.com"
 
+
+INCIDENCE_URGENCY_SLA = {
+    'LOW' : 7,
+    'MEDIUM' : 4,
+    'HIGH' : 1
+}
 
 
 # Default primary key field type

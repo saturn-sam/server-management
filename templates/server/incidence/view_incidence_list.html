@@ -1,0 +1,131 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% block title %} View Service {% endblock %} 
+
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap-multiselect/css/BsMultiSelect.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <section class="col-lg-12 connectedSortable">
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title">Incidents</h5>
+            </div>
+            <div class="card-body">
+                <table id="example3" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>SL</th>
+                            <th>Incidence ID</th>
+                            <th>Title</th>
+                            <th>Urgency/ Impact</th>
+                            <th>Incidence Time</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Related Task</th>
+                            <th>Response Time</th>
+                            <th>Task Due</th>
+                            <th>Assigned To</th>
+                            <th>Resolved By</th>
+                            <th>Resolved Time</th>
+                            <th>Created By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for incidence in incidence_lists %}
+                        <tr 
+                        {% if incidence.status == 1 and incidence.related_task.is_past_due %}       style="background-color: red;"
+                        {% elif incidence.status == 1 and not incidence.related_task.is_past_due %}
+                            style="background-color:#ffa600cc"
+                        {% endif %}
+                        >
+                            <td>{{forloop.counter}}</td>
+                            <td>
+                                <a href="{% url 'view-incidence' incidence.id %}">I-{{incidence.id}}</a>
+                            </td>
+                            <td>
+                                <a href="{% url 'view-incidence' incidence.id %}">{{incidence.title}}</a>
+                            </td>
+                            <td>
+                                {{incidence.get_urgency_display}} / {{incidence.get_impact_display}}
+                            </td>
+                            <td>
+                                {{incidence.triggered_time}}
+                            </td>
+                            <td>
+                                {{incidence.get_status_display}}
+                            </td>
+                            <td>
+                                {%for kb in incidence.related_kb.all%}
+                                    <a href="{% url 'kb-details' kb.id kb.slug %}">{{kb}}</a>,
+                                {%endfor%}
+                            </td>
+                            <td>
+                                <a href="{% url 'task-view' incidence.related_task.id %}">{{ incidence.related_task }}</a>
+                            </td>
+                            <td>
+                                {{incidence.responsed_at}}
+                            </td>
+                            <td>
+                                {{ incidence.related_task.due_date }}
+                            </td>
+                            <td>
+                                {% for assigned_to in incidence.assigned_to.all %}
+                                    {{assigned_to.get_full_name}},
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% for resolved_by in incidence.resolved_by.all %}
+                                    {{resolved_by.get_full_name}},
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if incidence.resolved_at %}
+                                    {{incidence.resolved_at}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{incidence.added_by.get_full_name}}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+
+<script>
+    $(function () {
+    $('#example3').DataTable({
+        // "scrollY": 300,
+        "scrollX": true,
+        "paging": true,
+        "lengthChange": false,
+        "searching": true,
+        "ordering": false,
+        "info": true,
+        "autoWidth": false,
+        "responsive": false,
+    });
+    });
+</script>
+
+{% endblock javascripts %}

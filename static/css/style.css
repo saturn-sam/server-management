@@ -441,6 +441,10 @@ a:focus, a:hover {
 .bg-red {
     background-color: #d4702d!important
 }
+.bg-blue {
+    background-color: #22a9e6!important
+}
+
 
 .invoice {
     background-color: #fff;

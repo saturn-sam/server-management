@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from .views import task_create, private_task_create, task_list, task_view, add_comment, change_status,change_assign_to, change_ref_task, change_due_date, change_kb, change_visibility, search_task
+from .views import task_create, private_task_create, task_list, task_view, add_comment, change_status,change_assign_to, change_ref_task, change_due_date, change_kb, change_visibility, search_task, user_and_category_wise_report
 
 urlpatterns = [
 #     path('', home_page, name='kb-home'),
@@ -17,6 +17,7 @@ urlpatterns = [
     path('change-ref-task', change_ref_task, name='change-ref-task'),
     path('change-due-date', change_due_date, name='change-due-date'),
     path('change-kb', change_kb, name='change-kb'),
+    path('user_cat_report', user_and_category_wise_report, name='user_cat_report'),
 #     path('knowledge/<int:pk>-<str:slug>/', KBDetailView, name='kb-details'),
 #     path('<int:pk>-<str:slug>/Preview/', kbpreview, name='kb-preview'),
 #     path('like', like_post, name='like-post'),

@@ -24,7 +24,7 @@ from django.contrib.auth.views import LoginView
 from knowledgebase.models import KnowledgeBase, KBTopic
 from authentication.models import CustomUser, Profile
 from licenseinfo.models import LicenseInfo
-
+from taskmanager.models import TaskManager
 # from accounting.models import Deposite, Earning, Expenditure, Subscriptionof
 
 # Create your views here.
@@ -63,6 +63,9 @@ def home_page(request):
     active_license = LicenseInfo.objects.filter(delete_status=False, license_status=True).count()
     expire_soon = LicenseInfo.objects.filter(delete_status=False, license_status=True, end_date__lte = timezone.now() + timedelta(days=90), end_date__gte = timezone.now()).count()
     expired = LicenseInfo.objects.filter(delete_status=False, license_status=False).count()
+    complete_task = TaskManager.objects.filter(delete_status=False, task_status=2).count()
+    incomplete_task = TaskManager.objects.filter(delete_status=False, task_status__in =[1,3]).count()
+
     context ={
         'total_user':total_user,
         'total_physical_server':total_physical_server,
@@ -72,7 +75,9 @@ def home_page(request):
         'total_kb_topic':total_kb_topic,
         'active_license':active_license,
         'expire_soon':expire_soon,
-        'expired':expired
+        'expired':expired,
+        'complete_task':complete_task,
+        'incomplete_task':incomplete_task
     }
     return render(request, 'server/index.html', context)
 
@@ -89,6 +94,10 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         messages.success(self.request, 'Profile Saved Successfully.')
         return reverse('home')
+
+# @login_required
+# def get_task_count(request):
+#     return JsonResponse({'completed_task':'5'}) 
 
 # @login_required
 # def dashboard(request):
