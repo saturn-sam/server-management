@@ -1,0 +1,167 @@
+
+{% if task_query %}
+<section class="col-lg-12 connectedSortable">
+    <div class="card mt-3">
+        <div class="card-header">
+            <h5 class="card-title">Search Result</h5>
+        </div>
+        
+        <div class="card-body">
+          
+          <table id="example3" class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>SL</th>
+                    <th>Task ID</th>
+                    <th>Task</th>
+                    <th>Task Type</th>
+                    <th>Description</th>
+                    <th>Assigned To</th>
+                    <th>Assigned By</th>
+                    <th>Creation Date</th>
+                    <th>Due Date</th>
+                    <th>Completion Date</th>
+                    <th>Task Status</th>
+                       
+                    <th>Comments</th>
+                        
+                    <th>Related KB</th>
+                    <th>Reference Task</th>
+                    <th>Created By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task_list in task_query %}
+
+                    <tr 
+                        {% if task_list.task_status == 1 and task_list.is_past_due or task_list.task_status == 3 and task_list.is_past_due %}
+                            style="background-color: red;"
+
+                        {% elif task_list.task_status == 1 and not task_list.is_past_due %}
+                            style="background-color: orange;"
+                        
+                        {% elif task_list.task_status == 3 and not task_list.is_past_due %}
+                            style="background-color: #b6b6b4;"    
+
+                        {% elif task_list.task_status == 4 %}
+                            style="background-color: #9b84c7;" 
+
+                        {% else %}
+                            style="background-color: #ffffff;"
+
+                        {% endif %}
+                    >
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <a href="{% url 'task-view' task_list.id %}">T-{{task_list.id}}</a>
+                            {% if task_list.task_visibility == 2 %}
+                                <i class="fa fa-lock" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Private Task"></i>
+                            {% endif %}
+                        </td>
+                        <td><a href="{% url 'task-view' task_list.id %}">{{task_list.task_title}}</a></td>
+                        <td>{{task_list.task_type}}</td>
+                        <td>{{task_list.description|truncatechars:50}}</td>
+                        <td>
+                            {% for assigned_to in task_list.assigned_to.all %}
+                                {{assigned_to.get_full_name}},
+                            {% endfor %}
+                        </td>
+                        <td>{{task_list.assigned_by.get_full_name}}</td>
+                        <td>{{task_list.created_at}}</td>
+                        <td>{{task_list.due_date}}</td>
+                        <td>
+                            {% if task_list.completed_date %}
+                            {{task_list.completed_date}}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task_list.task_status == 1 %}
+                                Incomplete
+                            {% elif task_list.task_status == 2 %} 
+                                Complete
+                            {% elif task_list.task_status == 3 %}
+                                Pause
+                            {% elif task_list.task_status == 4 %}
+                                Cancel
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task_list.task_steps_commentary.all%}
+                            <b>
+                                <a href="#" data-toggle="modal" data-target="#view-task-comment-{{task_list.id}}">View</a></br>
+                                
+                                    <!--Service Type Add Modal-->
+                                    <div class="modal fade modal-view-service" id="view-task-comment-{{task_list.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content new-post-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLongTitle">Task Step Comments</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% for i in task_list.task_steps_commentary.all|dictsortreversed:"add_time"  %}
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        Comment:
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        {{i.comment}}
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        Commenter:
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        {{i.added_by.get_full_name}}
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        Comment date:
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        {{i.add_time}}
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <!--Service Type Add Modal End-->
+                                
+                            </b>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task_list.task_procedure_or_kb %}
+                                {%for tasklistkb in task_list.task_procedure_or_kb.all%}
+                                    <a href="{% url 'kb-details' tasklistkb.id tasklistkb.slug %}">KB-{{ tasklistkb.id }}</a>,
+                                {%endfor%}
+                                
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if task_list.reference_task %}
+                                <a href="{% url 'task-view' task_list.reference_task.id %}">T-{{task_list.reference_task.id}}</a>
+                            {% endif %}
+                        </td>
+                        <td>{{task_list.created_by.get_full_name}}</td>
+                        
+                    </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
+    </div>
+</section>  
+{% endif %}

@@ -1,0 +1,46 @@
+{% if user_data %}
+<section class="col-lg-12 connectedSortable" style="margin:0 auto;">
+    <div class="card mt-3">
+        <div class="card-header">
+            <h5 class="card-title" style="margin:0 auto;">Search Result</h5>
+        </div>
+        
+        <div class="card-body">
+
+
+
+            <table id="example3" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>SL</th>
+                        <th>User</th>
+                        {% for task_type in task_types %}
+                            <th>{{ task_type }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for email, user in user_data.items %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ user.full_name }}</td>
+                        {% for task_type in task_types %}
+                            {% for i,j in user.tasks.items %}
+                                
+                                {% if task_type == i %}
+                                <td>{{j}}</td>
+                                
+                                {% endif %}
+                            
+                            {% endfor %}
+                        {% endfor %}
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</section>  
+{% endif %} 

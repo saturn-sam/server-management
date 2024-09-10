@@ -7,10 +7,26 @@ from django.conf import settings
 from knowledgebase.models import KnowledgeBase
 # from django.forms import Textarea
 
+class TaskType(models.Model):
+    type = models.CharField(max_length=255,blank=False)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="tasktype_created_by_user")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+            return f"{self.type}"
+
 # Create your models here.
 class TaskManager(models.Model):
-
+    # TASK_TYPE=(
+    #     ('FRMRPT Deployment', 'frmrpt'),
+    #     ('Branch User Support', 'brusersupport'),
+    #     ('Website Publish', 'webpub'),
+    #     ('VM Creation', 'vmcreate'),
+    #     ('VM Modification', 'vmmod'),
+    #     ('Other', 'other'),
+    # )
     task_title = models.CharField(max_length=255,blank=False)
+    task_type =  models.ForeignKey(TaskType, on_delete=models.SET_NULL, null=True, blank=True, related_name="tm_task_type")
     description = models.TextField(blank=False)
     assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="tm_assigned_to", null=True, blank=True)
     assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="tm_assigned_by")
@@ -20,7 +36,7 @@ class TaskManager(models.Model):
     task_status = models.IntegerField(blank=False, default=1) # 1 incomplete, 2 complete, 3 incomplete pause, 4 Canceled
     # task_steps_commentary = models.TextField(blank=True)
     task_steps_commentary = models.ManyToManyField('TaskStepComentary', related_name="tmcommentary", blank=True)
-    task_procedure_or_kb = models.ManyToManyField(KnowledgeBase)
+    task_procedure_or_kb = models.ManyToManyField(KnowledgeBase, blank=True, null=True)
     # subtask = models.ManyToManyField('TaskManager', related_name="tmsubtask", null=True, blank=True)
     reference_task = models.ForeignKey('TaskManager', on_delete=models.SET_NULL, related_name="reftask", null=True, blank=True)
     task_visibility = models.IntegerField(blank=True, null=True) # 1 for public, 2 for private 
@@ -35,7 +51,7 @@ class TaskManager(models.Model):
         return timezone.now() > self.due_date
 
     def __str__(self):
-        return f"T{self.id} - {self.task_title}"
+        return f"T{self.id} - {self.task_type} - {self.task_title}"
 
 class TaskStepComentary(models.Model):
     comment = models.TextField(blank=True, null=True)

@@ -12,5 +12,4 @@ urlpatterns = [
     path('pass_list', views.pass_list, name='pass_list'),
     path('view_pass', views.view_pass, name='view_pass'),
     path('delete_entry', views.delete_entry, name='delete_entry'),
-
 ]

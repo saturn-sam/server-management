@@ -1,0 +1,178 @@
+{% extends "server/layouts/base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %} Search Task {% endblock %} 
+
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/dataTables.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/datatables/css/responsive.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap-multiselect/css/BsMultiSelect.min.css' %}">
+  <!-- XDSoft DateTimePicker -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" />
+
+{% endblock stylesheets %}
+
+  
+
+{% block content %}
+
+    <div class="page-body">
+        <div class="container-fluid">
+            <div class="profile-body">
+                <div class="col-md-4 mt-2 pb-2 border" style="margin:0 auto;">
+                  <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for hidden_field in form.hidden_fields %}
+                      {{ hidden_field }}
+                    {% endfor %}
+                
+                    <fieldset class="form-group pt-3">
+                      <h3 class="text-center">Search Task</h3>
+                      {% if form.non_field_errors %}
+                      <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}                          
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                              {{ form.task_type.label_tag }}
+                              <span style="color:red">*</span>
+                              {{ form.task_type.errors }}
+                              {{ form.task_type|add_class:'form-control form-control-sm' }}
+                          </div>
+                          <div class="form-group col-md-6">
+                            {{ form.task_status.label_tag }}
+                            <span style="color:red">*</span>
+                            {{ form.task_status.errors }}
+                            <div class="ms-auto">
+                              {{ form.task_status|add_class:'form-control form-control-sm' }}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{ form.assigned_to.label_tag }}
+                                <span style="color:red">*</span>
+                                <span style="color:red">{{ form.assigned_to.errors }}</span>
+                                {{ form.assigned_to|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ form.assigned_by.label_tag }}
+                                <span style="color:red">*</span>
+                                <span style="color:red">{{ form.assigned_by.errors }}</span>
+                                {{ form.assigned_by|add_class:'form-control form-control-sm' }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{ form.created_at.label_tag }}
+                                <span style="color:red">*</span>
+                                {{ form.created_at.errors }}
+                                {{ form.created_at|add_class:'form-control form-control-sm' }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ form.completed_date.label_tag }}
+                                {{ form.completed_date.errors }}
+                                {{ form.completed_date|add_class:'form-control form-control-sm' }}
+                            </div>
+                        </div>
+
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{ form.summary_report.label_tag }}
+                                <span style="color:red">*</span>
+                                {{ form.summary_report.errors }}
+                                {{ form.summary_report }}
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="row">
+                        <div class="col-md-6 border-top pt-2">
+                          <button name="show" type="submit" class="btn btn-success btn-block">Show</button>
+                        </div>
+                        <div class="col-md-6 border-top pt-2">
+                          <button name="download" type="submit" class="btn btn-success btn-block">Download</button>
+                        </div>
+                      </div>
+
+  
+
+                  </form>                                        
+                </div>
+                
+                {% if summary_report %}
+                    {% include 'server/taskmanager/cat_wise_report.html' %}
+                {% else %}
+                    {% include 'server/taskmanager/task_detail_report.html' %}
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
+
+{% block javascripts %}
+  <script src="{% static 'plugins/popper/popper.min.js'%}"></script>
+  <script src="{% static 'plugins/bsmultiselect/BsMultiSelect.bs4.min.js'%}"></script>
+
+  <script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/js/dataTables.bootstrap5.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/js/dataTables.responsive.min.js' %}"></script>
+  <script src="{% static 'plugins/datatables/js/responsive.bootstrap5.min.js' %}"></script>
+    <!-- XDSoft DateTimePicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        $('#id_task_type').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#id_task_status').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#id_assigned_to').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#id_assigned_by').bsMultiSelect({
+          placeholder:'All',
+        });
+        $('#multiple-checkboxes5').bsMultiSelect({
+          placeholder:'All',
+        });
+    });
+</script>
+    <script>
+      $(function () {
+        $('#example3').DataTable({
+            // "scrollY": 300,
+            "scrollX": true,
+            "paging": false,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": false,
+            "info": true,
+            "autoWidth": false,
+            "responsive": false,
+        });
+      });
+    </script>    
+
+    <script>
+        $(function () {
+            $("#id_created_at").datetimepicker({
+            format: 'd/m/Y',timepicker:false,mask:true,
+          });
+            $("#id_completed_date").datetimepicker({
+            format: 'd/m/Y',timepicker:false,mask:true
+          });    
+          });
+    </script>
+{% endblock javascripts %}

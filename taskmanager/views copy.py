@@ -1,5 +1,4 @@
 from cmath import log
-from datetime import datetime, timedelta
 from django.http import JsonResponse, Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.db.models import Q
@@ -101,6 +100,7 @@ def task_create(request):
 
     }
     return render(request, 'server/taskmanager/task_add.html', context) 
+
 
 
 @login_required
@@ -238,49 +238,21 @@ def get_summary_report(task_query):
 def search_task(request):
     all_users = CustomUser.objects.filter(is_active=True)
     all_task_type = TaskType.objects.all()
-    # summary_report = False
     if request.method == 'POST':
-        # task_add_form = TaskReportForm(request.POST)
-        # for field in task_add_form:
-        #     print("Field Error:", field.name,  field.errors)
-        
-        # if task_add_form.is_valid():
-            # task_assigned_to = task_add_form.cleaned_data['assigned_to']
-
+        # assigned_to_user = []
+        # assigned_by_user = []
         task_assigned_to = request.POST.getlist('assigned_to')
         task_assigned_by = request.POST.getlist('assigned_by')
         task_status = request.POST.getlist('task_status')
         task_due = request.POST.getlist('task_due')
-        # print(task_due)
-        task_type = request.POST.getlist('task_type')
+        task_type = request.POST.getlist('task-type')
         summary_report = request.POST.getlist('summary_report')
+        # print(task_type)
         # print(summary_report)
-        start_date = request.POST.get('start-date')
-        end_or_due_date = request.POST.get('end-or-due-date')
-        if start_date == '':
-            start_date = '1970-01-01 00:00:00'
-            start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
-            start_date = timezone.make_aware(start_date)
-            print(start_date)
-        else:
-            start_date = start_date + ' 00:00:00'
-            start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
-            start_date = timezone.make_aware(start_date)
-            # print(start_date)
-
-        if end_or_due_date == '':
-            today = timezone.now()
-            end_or_due_date = today + timedelta(days=365)
-            print(end_or_due_date)
-        else:
-            end_or_due_date = end_or_due_date + ' 23:59:59'
-            end_or_due_date = datetime.strptime(end_or_due_date, "%Y-%m-%d %H:%M:%S")
-            end_or_due_date = timezone.make_aware(end_or_due_date)
-            # print(end_or_due_date)        
-
 
         if not task_assigned_to or 'all' in task_assigned_to:
             task_assigned_to = CustomUser.objects.filter(is_active=True)
+            # print(task_assigned_to)
         if not task_assigned_by or 'all' in task_assigned_by:
             task_assigned_by = CustomUser.objects.filter(is_active=True)
         if not task_status or 'all' in task_status:
@@ -293,38 +265,27 @@ def search_task(request):
             assigned_to__in = task_assigned_to, 
             assigned_by__in = task_assigned_by, 
             task_status__in = task_status,
-            task_type__in = task_type,
-            created_at__gt = start_date,
+            task_type__in = task_type
             ).order_by('task_status','due_date')
             # ).order_by('task_status','due_date').distinct()
-        # print(task_query.count())
-
-        
-        # task_query = task_query.filter(
-        #     Q(delete_status=False) & (
-        #         (Q(task_visibility=2) & Q(created_by=request.user)) | Q(task_visibility=1)
-        #     ) &
-        #         ( Q(task_status__in=[1,3,4], due_date__lt = end_or_due_date) | Q(task_status__in=[2], completed_date__lt=end_or_due_date)) 
-             
-        #     ).order_by('task_status','due_date')
-
+        print(task_query.count())
         task_query = task_query.filter(
             Q(delete_status=False) & (
-                (Q(task_visibility=2) & Q(created_by=request.user)) | Q(task_visibility=1)
-            ) &
-                # ( Q(completed_date__lt=end_or_due_date) | Q(due_date__lt = end_or_due_date) )
-                ( Q(task_status__in=[1,3,4], due_date__lt = end_or_due_date) | Q(task_status__in=[2], completed_date__lt=end_or_due_date)) 
-             
-            ).order_by('task_status','due_date')        
+                (Q(task_visibility=2) &
+                    Q(created_by=request.user)
+                ) | 
+                Q(task_visibility=1)
+            )
+            ).order_by('task_status','due_date')
+        # print(TaskManager.objects.all().count())
         
-        print(task_query.query)
         if not task_query:
             messages.warning(request, 'No result found based on the criteria!')
 
         if 'show' in request.POST:
             if summary_report:
                 mydict, task_types = get_summary_report(task_query)
-                print(summary_report)
+                # print(mydict)
 
                 context = {
                     'all_users':all_users,
@@ -473,12 +434,9 @@ def search_task(request):
     # # shows charts in reversed, so last row of dataframe will show at bottom
     # fig.update_yaxes(autorange="reversed")
     # fig.show()
-    # form = TaskReportForm()
+    form = TaskReportForm()
     context = {
-        # 'form':form
-        'all_users':all_users,
-        'all_task_type':all_task_type,
-
+        'form':form
     }
     return render(request, 'server/taskmanager/task_report.html', context)
 

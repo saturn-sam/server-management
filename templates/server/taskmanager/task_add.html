@@ -38,6 +38,22 @@
                     </div>
                 </div>
                 <div class="form-row">
+                  <div class="form-group col-md-6">
+                      {{ task_add_form.task_type.label_tag }}
+                      <span style="color:red">*</span>
+                      {{ task_add_form.task_type.errors }}
+                      {{ task_add_form.task_type|add_class:'form-control form-control-sm' }}
+                  </div>
+                  <div class="form-group col-md-6">
+                    {{ task_add_form.task_status.label_tag }}
+                    <span style="color:red">*</span>
+                    {{ task_add_form.task_status.errors }}
+                    <div class="ms-auto">
+                      {{ task_add_form.task_status|add_class:'form-control form-control-sm' }}
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
                     <div class="form-group col-md-6">
                         {{ task_add_form.assigned_to.label_tag }}
                         <span style="color:red">*</span>

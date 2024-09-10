@@ -4,4 +4,5 @@ from .models import *
 admin.site.register(TaskManager)
 admin.site.register(TaskStepComentary)
 admin.site.register(TaskHistory)
+admin.site.register(TaskType)
 
