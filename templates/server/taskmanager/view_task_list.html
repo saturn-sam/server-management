@@ -28,15 +28,15 @@
                                     <th>Task Type</th>
                                     <th>Assigned To</th>
                                     <th>Assigned By</th>
+                                    <th>Task Status</th>
+                                    <th>Start Date</th>
                                     <th>Due Date</th>
                                     <th>Completion Date</th>
-                                    <th>Task Status</th>
                                        
                                     <th>Comments</th>
                                         
                                     <th>Related KB</th>
                                     <th>Reference Task</th>
-                                    <th>Created By</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -79,14 +79,6 @@
                                             {% endfor %}
                                         </td>
                                         <td>{{task_list.assigned_by.get_full_name}}</td>
-                                        <td>{{task_list.due_date}}</td>
-                                        <td>
-                                            {% if task_list.completed_date %}
-                                            {{task_list.completed_date}}
-                                            {% else %}
-                                            -
-                                            {% endif %}
-                                        </td>
                                         <td>
                                             {% if task_list.task_status == 1 %}
                                             Incomplete
@@ -96,6 +88,15 @@
                                                 Pause
                                             {% elif task_list.task_status == 4 %}
                                                 Cancel
+                                            {% endif %}
+                                        </td>
+                                        <td>{{task_list.start_date}}</td>
+                                        <td>{{task_list.due_date}}</td>
+                                        <td>
+                                            {% if task_list.completed_date %}
+                                            {{task_list.completed_date}}
+                                            {% else %}
+                                            -
                                             {% endif %}
                                         </td>
                                         <td>
@@ -165,7 +166,6 @@
                                                 <a href="{% url 'task-view' task_list.reference_task.id %}">T-{{task_list.reference_task.id}}</a>
                                             {% endif %}
                                         </td>
-                                        <td>{{task_list.created_by.get_full_name}}</td>
                                         
                                     </tr>
                                 {% endfor %}

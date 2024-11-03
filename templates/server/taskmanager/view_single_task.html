@@ -218,325 +218,325 @@
 
                                       <!--KB Add-->
                                       {% if task_history.task_procedure_or_kb.all %}
-                                      <div class="vertical-timeline-item vertical-timeline-element">
-                                          <div> 
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                <i class="badge badge-dot-xl2 badge-primary">
-                                                  <i class="fas 	fas fa-book-open badge-icon text-white"></i>
-                                                </i>
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                
-                                                  <p>
-                                                    <b>
-                                                      {{task_history.kb_insert_by.get_full_name}}
-                                                    </b> 
-                                                    added knowledge
-                                                    
-                                                    {% for kb in task_history.task_procedure_or_kb.all %}
-                                                      {% if kb.author == request.user or kb.status == 'published' %}
-                                                        <a href="{% url 'kb-details' kb.id kb.slug %}">KB{{ kb.id }}</a>,  
-                                                      {% endif %}
-                                                      
-                                                    {% endfor %}
-                                                    to 
-                                                    Task 
-                                                    <a href="{% url 'task-view' task_history.task.id  %}">
+                                        <div class="vertical-timeline-item vertical-timeline-element">
+                                            <div> 
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                  <i class="badge badge-dot-xl2 badge-primary">
+                                                    <i class="fas 	fas fa-book-open badge-icon text-white"></i>
+                                                  </i>
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                  
+                                                    <p>
                                                       <b>
-                                                        T-{{task_history.task.id}}
-                                                      </b>
-                                                    </a>
-                                                  </p>
-                                                  <span class="vertical-timeline-element-date">
-                                                    {{task_history.effective_date|date:"M d, Y"}}
-                                                    <br>
-                                                    {{task_history.effective_date|date:"H:i"}}
-                                                  </span>
-                                                   
-                                              </div>
-                                          </div>
-                                      </div>
+                                                        {{task_history.kb_insert_by.get_full_name}}
+                                                      </b> 
+                                                      added knowledge
+                                                      
+                                                      {% for kb in task_history.task_procedure_or_kb.all %}
+                                                        {% if kb.author == request.user or kb.status == 'published' %}
+                                                          <a href="{% url 'kb-details' kb.id kb.slug %}">KB{{ kb.id }}</a>,  
+                                                        {% endif %}
+                                                        
+                                                      {% endfor %}
+                                                      to 
+                                                      Task 
+                                                      <a href="{% url 'task-view' task_history.task.id  %}">
+                                                        <b>
+                                                          T-{{task_history.task.id}}
+                                                        </b>
+                                                      </a>
+                                                    </p>
+                                                    <span class="vertical-timeline-element-date">
+                                                      {{task_history.effective_date|date:"M d, Y"}}
+                                                      <br>
+                                                      {{task_history.effective_date|date:"H:i"}}
+                                                    </span>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
                                       {% endif %}
 
                                       <!--Assigned to/by Add-->
                                       {% if task_history.assigned_to.all %}
-                                      <div class="vertical-timeline-item vertical-timeline-element">
-                                          <div> 
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                <i class="badge badge-dot-xl2 badge-primary">
-                                                  <i class="fas fa-chart-network badge-icon text-white"></i>
-                                                </i>
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p>Task 
-                                                    <a href="{% url 'task-view' task_history.task.id  %}">
+                                        <div class="vertical-timeline-item vertical-timeline-element">
+                                            <div> 
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                  <i class="badge badge-dot-xl2 badge-primary">
+                                                    <i class="fas fa-chart-network badge-icon text-white"></i>
+                                                  </i>
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p>Task 
+                                                      <a href="{% url 'task-view' task_history.task.id  %}">
+                                                        <b>
+                                                          T-{{task_history.task.id}}
+                                                        </b>
+                                                      </a> assigned to 
                                                       <b>
-                                                        T-{{task_history.task.id}}
+                                                        {% for assigned in task_history.assigned_to.all %}
+                                                          {{assigned.get_full_name}},
+                                                        {% endfor %}
+                                                        
+                                                      </b> 
+                                                      by 
+                                                      <b>
+                                                        {{task_history.assigned_by.get_full_name}}
                                                       </b>
-                                                    </a> assigned to 
-                                                    <b>
-                                                      {% for assigned in task_history.assigned_to.all %}
-                                                        {{assigned.get_full_name}},
-                                                      {% endfor %}
-                                                      
-                                                    </b> 
-                                                    by 
-                                                    <b>
-                                                      {{task_history.assigned_by.get_full_name}}
-                                                    </b>
-                                                  </p>
-                                                  <span class="vertical-timeline-element-date">
-                                                    {{task_history.effective_date|date:"M d, Y"}}
-                                                    <br>
-                                                    {{task_history.effective_date|date:"H:i"}}
-                                                  </span>
-                                                   
-                                              </div>
-                                          </div>
-                                      </div>
+                                                    </p>
+                                                    <span class="vertical-timeline-element-date">
+                                                      {{task_history.effective_date|date:"M d, Y"}}
+                                                      <br>
+                                                      {{task_history.effective_date|date:"H:i"}}
+                                                    </span>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
                                       {% endif %}
 
                                       <!--Ref Task Add-->
                                       {% if task_history.ref_task_add %}
-                                      <div class="vertical-timeline-item vertical-timeline-element">
-                                          <div> 
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                <i class="badge badge-dot-xl2 badge-primary">
-                                                  <i class="fas fa-link badge-icon text-white"></i>
-                                                </i>
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p>
-                                                    Task 
-                                                    <a href="{% url 'task-view' task_history.ref_task_add.id  %}">
+                                        <div class="vertical-timeline-item vertical-timeline-element">
+                                            <div> 
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                  <i class="badge badge-dot-xl2 badge-primary">
+                                                    <i class="fas fa-link badge-icon text-white"></i>
+                                                  </i>
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p>
+                                                      Task 
+                                                      <a href="{% url 'task-view' task_history.ref_task_add.id  %}">
+                                                        <b>
+                                                          T-{{task_history.ref_task_add.id}}
+                                                        </b>
+                                                      </a> 
+                                                      added as reference of Task 
+                                                      <a href="{% url 'task-view' task_history.task.id  %}">
+                                                        <b>
+                                                          T-{{task_history.task.id}}
+                                                        </b>
+                                                      </a> 
+                                                      by 
                                                       <b>
-                                                        T-{{task_history.ref_task_add.id}}
+                                                        {{task_history.insert_by.get_full_name}}
                                                       </b>
-                                                    </a> 
-                                                    added as reference of Task 
-                                                    <a href="{% url 'task-view' task_history.task.id  %}">
-                                                      <b>
-                                                        T-{{task_history.task.id}}
-                                                      </b>
-                                                    </a> 
-                                                    by 
-                                                    <b>
-                                                      {{task_history.insert_by.get_full_name}}
-                                                    </b>
-                                                    .
-                                                  </p>
-                                                   <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
-                                                   
-                                              </div>
-                                          </div>
-                                      </div>
+                                                      .
+                                                    </p>
+                                                    <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
                                       {% endif %}
 
                                       <!--Sub Task Add-->
                                       {% if task_history.sub_task_add %}
-                                      <div class="vertical-timeline-item vertical-timeline-element">
-                                          <div> 
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                <i class="badge badge-dot-xl2 badge-primary">
-                                                  <i class="fas fa-network-wired badge-icon text-white"></i>
-                                                </i>
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p>
-                                                    Task 
-                                                    <a href="{% url 'task-view' task_history.sub_task_add.id  %}">
+                                        <div class="vertical-timeline-item vertical-timeline-element">
+                                            <div> 
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                  <i class="badge badge-dot-xl2 badge-primary">
+                                                    <i class="fas fa-network-wired badge-icon text-white"></i>
+                                                  </i>
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p>
+                                                      Task 
+                                                      <a href="{% url 'task-view' task_history.sub_task_add.id  %}">
+                                                        <b>
+                                                          T-{{task_history.sub_task_add.id}}
+                                                        </b>
+                                                      </a> 
+                                                      added as Sub task of Task 
+                                                      <a href="{% url 'task-view' task_history.task.id  %}">
+                                                        <b>
+                                                          T-{{task_history.task.id}}
+                                                        </b>
+                                                      </a> 
+                                                      by 
                                                       <b>
-                                                        T-{{task_history.sub_task_add.id}}
-                                                      </b>
-                                                    </a> 
-                                                    added as Sub task of Task 
-                                                    <a href="{% url 'task-view' task_history.task.id  %}">
-                                                      <b>
-                                                        T-{{task_history.task.id}}
-                                                      </b>
-                                                    </a> 
-                                                    by 
-                                                    <b>
-                                                      {{task_history.insert_by.get_full_name}}
-                                                    </b> 
-                                                  </p>
-                                                   <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
-                                                   
-                                              </div>
-                                          </div>
-                                      </div>
+                                                        {{task_history.insert_by.get_full_name}}
+                                                      </b> 
+                                                    </p>
+                                                    <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
                                       {% endif %}
 
                                       <!--Comment Add-->
                                       {% if task_history.comment_add %}
-                                      <div class="vertical-timeline-item vertical-timeline-element">
-                                          <div> 
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                  <i class="badge badge-dot-xl2 badge-success"> 
-                                                    <i class='far fa-comment-alt badge-icon text-white '></i> 
-                                                  </i> 
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p>
-                                                    {{task_history.comment_add.added_by.get_full_name}} added a comment.
-                                                  </p>
-                                                  <div class="pl-3">
-                                                    <i><b>&ldquo;</b>{{task_history.comment_add.comment}}</i>
-                                                  </div>
-                                                   <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
-                                                   
-                                              </div>
-                                          </div>
-                                      </div>
+                                        <div class="vertical-timeline-item vertical-timeline-element">
+                                            <div> 
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                    <i class="badge badge-dot-xl2 badge-success"> 
+                                                      <i class='far fa-comment-alt badge-icon text-white '></i> 
+                                                    </i> 
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p>
+                                                      {{task_history.comment_add.added_by.get_full_name}} added a comment.
+                                                    </p>
+                                                    <div class="pl-3">
+                                                      <i><b>&ldquo;</b>{{task_history.comment_add.comment}}</i>
+                                                    </div>
+                                                    <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
                                       {% endif %}
 
                                       <!--due date-->
                                       {% if task_history.due_date %}
-                                      <div class="vertical-timeline-item vertical-timeline-element">
-                                          <div> 
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                  <i class="badge badge-dot-xl2 badge-warning">
-                                                    <i class="fas fa-pennant badge-icon text-white"></i>
-                                                  </i> 
+                                        <div class="vertical-timeline-item vertical-timeline-element">
+                                            <div> 
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                    <i class="badge badge-dot-xl2 badge-warning">
+                                                      <i class="fas fa-pennant badge-icon text-white"></i>
+                                                    </i> 
 
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p>
-                                                    Task Due date {% if task_history.due_date != 1 %}
-                                                    {{task_history.due_date}} {% endif %} 
-                                                    <b>
-                                                      {{task_history.effective_date}}
-                                                    </b> 
-                                                    {% if task_history.due_date != 1 %} added by 
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p>
+                                                      Task Due date {% if task_history.due_date != 1 %}
+                                                      {{task_history.due_date}} {% endif %} 
                                                       <b>
-                                                        {{task_history.insert_by.get_full_name}}
+                                                        {{task_history.effective_date}}
                                                       </b> 
-                                                    {% endif %}
-                                                  </p>
-                                                  
-                                                   <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
-                                                   
-                                              </div>
-                                          </div>
-                                      </div>
+                                                      {% if task_history.due_date != 1 %} added by 
+                                                        <b>
+                                                          {{task_history.insert_by.get_full_name}}
+                                                        </b> 
+                                                      {% endif %}
+                                                    </p>
+                                                    
+                                                    <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
                                       {% endif %}         
                                       
                                       <!--status changed-->
                                       {% if task_history.changed_status %}
-                                      <div class="vertical-timeline-item vertical-timeline-element">
-                                          <div> 
-                                            <!--To Pause-->
-                                            {% if task_history.changed_status == '3' %}
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                  <i class="badge badge-dot badge-dot-xl2 badge-warning"><i class="fas fa-pause badge-icon text-white "></i> </i> 
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p>
-                                                    <b>
-                                                      {{task_history.insert_by.get_full_name}} 
-                                                    </b> 
-                                                    <b class="text-danger">
-                                                      Paused Task
-                                                    </b> 
-                                                    <a href="{% url 'task-view' task_history.task.id  %}">
+                                        <div class="vertical-timeline-item vertical-timeline-element">
+                                            <div> 
+                                              <!--To Pause-->
+                                              {% if task_history.changed_status == '3' %}
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                    <i class="badge badge-dot badge-dot-xl2 badge-warning"><i class="fas fa-pause badge-icon text-white "></i> </i> 
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p>
                                                       <b>
-                                                        T-{{task_history.task.id}}
-                                                      </b>
-                                                    </a>
-                                                    . 
-                                                  </p>
-                                                  
-                                                   <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
-                                                   
-                                              </div>
-                                              {% endif %}
+                                                        {{task_history.insert_by.get_full_name}} 
+                                                      </b> 
+                                                      <b class="text-danger">
+                                                        Paused Task
+                                                      </b> 
+                                                      <a href="{% url 'task-view' task_history.task.id  %}">
+                                                        <b>
+                                                          T-{{task_history.task.id}}
+                                                        </b>
+                                                      </a>
+                                                      . 
+                                                    </p>
+                                                    
+                                                    <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                                    
+                                                </div>
+                                                {% endif %}
 
-                                            <!--To Incomplete-->
-                                            {% if task_history.changed_status == '1' %}
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                  <i class="badge badge-dot badge-dot-xl2 badge-warning">
-                                                    <i class="fas fa-play badge-icon text-white"></i> 
-                                                  </i> 
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p>
-                                                    <b>
-                                                      {{task_history.insert_by.get_full_name}} 
-                                                    </b> 
-                                                    <b class="text-success">
-                                                      Activated task
-                                                    </b>  
-                                                    <a href="{% url 'task-view' task_history.task.id  %}">
+                                              <!--To Incomplete-->
+                                              {% if task_history.changed_status == '1' %}
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                    <i class="badge badge-dot badge-dot-xl2 badge-warning">
+                                                      <i class="fas fa-play badge-icon text-white"></i> 
+                                                    </i> 
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p>
                                                       <b>
-                                                        T-{{task_history.task.id}}
-                                                      </b>
-                                                    </a>
-                                                    .
-                                                  </p>
-                                                  
-                                                   <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
-                                                   
-                                              </div>
-                                              {% endif %}
+                                                        {{task_history.insert_by.get_full_name}} 
+                                                      </b> 
+                                                      <b class="text-success">
+                                                        Activated task
+                                                      </b>  
+                                                      <a href="{% url 'task-view' task_history.task.id  %}">
+                                                        <b>
+                                                          T-{{task_history.task.id}}
+                                                        </b>
+                                                      </a>
+                                                      .
+                                                    </p>
+                                                    
+                                                    <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                                    
+                                                </div>
+                                                {% endif %}
 
-                                              
-                                              <!--To Complete-->
-                                              {% if task_history.changed_status == '2' %}
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                  <i class="badge badge-dot badge-dot-xl2 badge-success">
-                                                    <i class="fas fa-check badge-icon text-white "></i> 
-                                                  </i> 
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p><b>{{task_history.insert_by.get_full_name}} </b> marked task <a href="{% url 'task-view' task_history.task.id  %}"><b>T-{{task_history.task.id}}</b></a> <b class="text-success">Completed</b></p>
-                                                  
-                                                   <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
-                                                   
-                                              </div>
-                                              {% endif %}
+                                                
+                                                <!--To Complete-->
+                                                {% if task_history.changed_status == '2' %}
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                    <i class="badge badge-dot badge-dot-xl2 badge-success">
+                                                      <i class="fas fa-check badge-icon text-white "></i> 
+                                                    </i> 
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p><b>{{task_history.insert_by.get_full_name}} </b> marked task <a href="{% url 'task-view' task_history.task.id  %}"><b>T-{{task_history.task.id}}</b></a> <b class="text-success">Completed</b></p>
+                                                    
+                                                    <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                                    
+                                                </div>
+                                                {% endif %}
 
-                                              <!--To Cancel-->
-                                              {% if task_history.changed_status == '4' %}
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                  <i class="badge badge-dot badge-dot-xl2 badge-danger">
-                                                    <i class="fas fa-window-close badge-icon text-white"></i> 
-                                                  </i> 
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p><b>{{task_history.insert_by.get_full_name}} </b> <b class="text-danger">Cancelled </b> task <a href="{% url 'task-view' task_history.task.id  %}"><b>{{task_history.task.id}}</b></a> </p>
-                                                  
-                                                   <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
-                                                   
-                                              </div>
-                                              {% endif %}
+                                                <!--To Cancel-->
+                                                {% if task_history.changed_status == '4' %}
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                    <i class="badge badge-dot badge-dot-xl2 badge-danger">
+                                                      <i class="fas fa-window-close badge-icon text-white"></i> 
+                                                    </i> 
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p><b>{{task_history.insert_by.get_full_name}} </b> <b class="text-danger">Cancelled </b> task <a href="{% url 'task-view' task_history.task.id  %}"><b>{{task_history.task.id}}</b></a> </p>
+                                                    
+                                                    <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                                    
+                                                </div>
+                                                {% endif %}
 
-                                          </div>
-                                      </div>
+                                            </div>
+                                        </div>
                                       {% endif %}  
 
                                       <!--Task Visibility-->
                                       {% if task_history.task_visibility == 1 %}
-                                      <div class="vertical-timeline-item vertical-timeline-element">
-                                          <div> 
-                                              <span class="vertical-timeline-element-icon bounce-in"> 
-                                                  <i class="badge badge-dot-xl2 badge-success">
-                                                    <i class="fa fa-eye badge-icon text-white"></i>
-                                                  </i> 
+                                        <div class="vertical-timeline-item vertical-timeline-element">
+                                            <div> 
+                                                <span class="vertical-timeline-element-icon bounce-in"> 
+                                                    <i class="badge badge-dot-xl2 badge-success">
+                                                      <i class="fa fa-eye badge-icon text-white"></i>
+                                                    </i> 
 
-                                              </span>
-                                              <div class="vertical-timeline-element-content bounce-in">
-                                                  <p>
-                                                    <b>
-                                                      {{task_history.insert_by.get_full_name}}
-                                                    </b> 
-                                                    changed the visibility of the task to <b>Public</b>
-                                                  </p>
-                                                  
-                                                   <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
-                                                   
-                                              </div>
-                                          </div>
-                                      </div>
+                                                </span>
+                                                <div class="vertical-timeline-element-content bounce-in">
+                                                    <p>
+                                                      <b>
+                                                        {{task_history.insert_by.get_full_name}}
+                                                      </b> 
+                                                      changed the visibility of the task to <b>Public</b>
+                                                    </p>
+                                                    
+                                                    <span class="vertical-timeline-element-date">{{task_history.effective_date|date:"M d, Y"}}<br>{{task_history.effective_date|date:"H:i"}}</span>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
                                       {% endif %}  
 
 

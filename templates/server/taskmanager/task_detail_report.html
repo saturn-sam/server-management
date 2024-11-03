@@ -15,16 +15,13 @@
                     <th>Task ID</th>
                     <th>Task</th>
                     <th>Task Type</th>
-                    <th>Description</th>
                     <th>Assigned To</th>
                     <th>Assigned By</th>
-                    <th>Creation Date</th>
+                    <th>Start Date</th>
                     <th>Due Date</th>
                     <th>Completion Date</th>
                     <th>Task Status</th>
-                       
                     <th>Comments</th>
-                        
                     <th>Related KB</th>
                     <th>Reference Task</th>
                     <th>Created By</th>
@@ -60,14 +57,13 @@
                         </td>
                         <td><a href="{% url 'task-view' task_list.id %}">{{task_list.task_title}}</a></td>
                         <td>{{task_list.task_type}}</td>
-                        <td>{{task_list.description|truncatechars:50}}</td>
                         <td>
                             {% for assigned_to in task_list.assigned_to.all %}
                                 {{assigned_to.get_full_name}},
                             {% endfor %}
                         </td>
                         <td>{{task_list.assigned_by.get_full_name}}</td>
-                        <td>{{task_list.created_at}}</td>
+                        <td>{{task_list.start_date}}</td>
                         <td>{{task_list.due_date}}</td>
                         <td>
                             {% if task_list.completed_date %}

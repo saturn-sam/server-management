@@ -33,7 +33,7 @@
                     <div class="form-group col-md-12">
                         {{ task_add_form.task_title.label_tag }}
                         <span style="color:red">*</span>
-                        {{ task_add_form.task_title.errors }}
+                        <span style="color:red">{{ task_add_form.task_title.errors }}</span>
                         {{ task_add_form.task_title|add_class:'form-control form-control-sm' }}
                     </div>
                 </div>
@@ -41,13 +41,13 @@
                   <div class="form-group col-md-6">
                       {{ task_add_form.task_type.label_tag }}
                       <span style="color:red">*</span>
-                      {{ task_add_form.task_type.errors }}
+                      <span style="color:red">{{ task_add_form.task_type.errors }} </span>
                       {{ task_add_form.task_type|add_class:'form-control form-control-sm' }}
                   </div>
                   <div class="form-group col-md-6">
                     {{ task_add_form.task_status.label_tag }}
                     <span style="color:red">*</span>
-                    {{ task_add_form.task_status.errors }}
+                    <span style="color:red">{{ task_add_form.task_status.errors }} </span>
                     <div class="ms-auto">
                       {{ task_add_form.task_status|add_class:'form-control form-control-sm' }}
                     </div>
@@ -69,22 +69,35 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        {{ task_add_form.due_date.label_tag }}
+                        {{ task_add_form.start_date.label_tag }}
                         <span style="color:red">*</span>
-                        {{ task_add_form.due_date.errors }}
-                        {{ task_add_form.due_date|add_class:'form-control form-control-sm' }}
+                        <span style="color:red"> {{ task_add_form.start_date.errors }} </span>
+                        {{ task_add_form.start_date|add_class:'form-control form-control-sm' }}
                     </div>
                     <div class="form-group col-md-6">
+                        {{ task_add_form.due_date.label_tag }}
+                        <span style="color:red">*</span>
+                        <span style="color:red">{{ task_add_form.due_date.errors }}</span>
+                        {{ task_add_form.due_date|add_class:'form-control form-control-sm' }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
                         {{ task_add_form.reference_task.label_tag }}
-                        {{ task_add_form.reference_task.errors }}
+                        <span style="color:red">{{ task_add_form.reference_task.errors }}</span>
                         {{ task_add_form.reference_task|add_class:'form-control form-control-sm' }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ task_add_form.task_procedure_or_kb.label_tag }}
+                        <span style="color:red">{{ task_add_form.task_procedure_or_kb.errors }}</span>
+                        {{ task_add_form.task_procedure_or_kb|add_class:'form-control form-control-sm' }}
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-12">
                         {{ task_add_form.description.label_tag }}
                         <span style="color:red">*</span>
-                        {{ task_add_form.description.errors }}
+                        <span style="color:red">{{ task_add_form.description.errors }}</span>
                         {{ task_add_form.description|add_class:'form-control form-control-sm' }}
                     </div>
                 </div>
@@ -116,11 +129,20 @@
         mask:true,
         defaultTime: '23:59',
       });
+      $("#id_start_date").datetimepicker({
+        format: 'Y-m-d H:i:s',
+        timepicker:true,
+        mask:true,
+        defaultTime: '23:59',
+      });
     });
   </script>
 <script>
     $(document).ready(function() {
         $('#id_assigned_to').bsMultiSelect({
+          placeholder:'Select',
+        });
+        $('#id_task_procedure_or_kb').bsMultiSelect({
           placeholder:'Select',
         });
     });

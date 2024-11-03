@@ -29,7 +29,7 @@ from incidence_log.views import update_incidence_status
 def task_create(request):
     user = request.user
     if request.method == 'POST':
-        task_add_form = TMCreateForm(request.POST)
+        task_add_form = TMCreateForm(request.POST, user=request.user)
         
         if task_add_form.is_valid():
             due_date = task_add_form.cleaned_data['due_date']
@@ -42,28 +42,32 @@ def task_create(request):
             new_task.task_visibility = 1 # 1 for public, 2 for private 
             new_task.task_status = task_status
             if task_status == '2':
-                new_task.completed_date = timezone.now()
+                new_task.completed_date = due_date
             new_task.created_by = request.user
             new_task.created_at = timezone.now()
             new_task.save()
 
+            # New Task Add
             history = TaskHistory(task=new_task,new_task_add=1,effective_date=timezone.now(),insert_date=timezone.now(),insert_by=request.user)
             history.save()
 
+            # Inser By, Assigned By, Assigned to Add
             history = TaskHistory(task=new_task,insert_by=request.user,effective_date=timezone.now(),insert_date=timezone.now())
             history.save()
             history.refresh_from_db()
             history.assigned_to.set(users)
-            # history.assigned_by = request.user
             history.assigned_by = task_add_form.cleaned_data['assigned_by']
             history.save()
 
+            # Due date 
             history = TaskHistory(task=new_task,due_date=1,effective_date=due_date,insert_date=timezone.now(),insert_by=request.user)
             history.save()
 
+            # Change Status Add
             history = TaskHistory(task=new_task,changed_status=task_status,insert_by=request.user,effective_date=timezone.now(),insert_date=timezone.now())
             history.save()
 
+            # Reference Task Add
             if ref_task:
                 history = TaskHistory(task=ref_task,sub_task_add=new_task,effective_date=timezone.now(),insert_date=timezone.now(),insert_by=request.user)
                 history.save()
@@ -93,7 +97,7 @@ def task_create(request):
             return redirect('add-task')
 
     else:
-        task_add_form = TMCreateForm()
+        task_add_form = TMCreateForm(user=request.user)
 
 
     context = {
@@ -251,17 +255,17 @@ def search_task(request):
         task_assigned_by = request.POST.getlist('assigned_by')
         task_status = request.POST.getlist('task_status')
         task_due = request.POST.getlist('task_due')
-        # print(task_due)
-        task_type = request.POST.getlist('task_type')
+        task_type = request.POST.getlist('task-type')
+        print(task_type)
         summary_report = request.POST.getlist('summary_report')
-        # print(summary_report)
         start_date = request.POST.get('start-date')
         end_or_due_date = request.POST.get('end-or-due-date')
+
         if start_date == '':
             start_date = '1970-01-01 00:00:00'
             start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
             start_date = timezone.make_aware(start_date)
-            print(start_date)
+            # print(start_date)
         else:
             start_date = start_date + ' 00:00:00'
             start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
@@ -285,8 +289,11 @@ def search_task(request):
             task_assigned_by = CustomUser.objects.filter(is_active=True)
         if not task_status or 'all' in task_status:
             task_status = ['1','2','3','4']
-        if not task_type or 'all' in task_type:
+        if not task_type:
             task_type = TaskType.objects.all()
+        if 'all' in task_type:
+            task_type = TaskType.objects.all()
+        print(task_type)
 
         task_query = TaskManager.objects.filter(
             delete_status=0, 
@@ -294,7 +301,7 @@ def search_task(request):
             assigned_by__in = task_assigned_by, 
             task_status__in = task_status,
             task_type__in = task_type,
-            created_at__gt = start_date,
+            start_date__gt = start_date,
             ).order_by('task_status','due_date')
             # ).order_by('task_status','due_date').distinct()
         # print(task_query.count())
@@ -317,7 +324,7 @@ def search_task(request):
              
             ).order_by('task_status','due_date')        
         
-        print(task_query.query)
+        # print(task_query.query)
         if not task_query:
             messages.warning(request, 'No result found based on the criteria!')
 
@@ -548,7 +555,7 @@ def change_status(request):
 def change_visibility(request):
     if request.method == 'POST':
         task_id = request.POST["task_id"]
-
+        
         task = TaskManager.objects.get(pk=task_id)
         task.task_visibility = 1
         

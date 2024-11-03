@@ -26,10 +26,11 @@ class TaskManager(models.Model):
     #     ('Other', 'other'),
     # )
     task_title = models.CharField(max_length=255,blank=False)
-    task_type =  models.ForeignKey(TaskType, on_delete=models.SET_NULL, null=True, blank=True, related_name="tm_task_type")
+    task_type =  models.ForeignKey(TaskType, on_delete=models.SET_NULL, null=True, blank=False, related_name="tm_task_type")
     description = models.TextField(blank=False)
     assigned_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="tm_assigned_to", null=True, blank=True)
     assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="tm_assigned_by")
+    start_date = models.DateTimeField(blank=False, null=False, default=timezone.now())
     due_date = models.DateTimeField(blank=False, null=False)
     completed_date = models.DateTimeField(blank=True, null=True)
     task_from_incidence = models.BooleanField(default=False)
